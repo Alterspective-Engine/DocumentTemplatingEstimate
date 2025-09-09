@@ -1,0 +1,22 @@
+{
+  "total_client_requirements": 547,
+  "matched": 545,
+  "unmatched": 2,
+  "match_rate": "99.6%",
+  "match_types": {
+    "Matched via Name": 439,
+    "Matched via PrecTitle": 106,
+    "Not Found": 2
+  },
+  "field_categories": {
+    "Other": 76,
+    "Merge Fields": 45,
+    "IF Statements": 9396,
+    "Document Variables": 2136
+  },
+  "manifest_precedents_count": 858,
+  "subfolder_manifests_parsed": 148,
+  "sql_documents": 782,
+  "sql_fields": 11653,
+  "sql_mappings": 19614
+}

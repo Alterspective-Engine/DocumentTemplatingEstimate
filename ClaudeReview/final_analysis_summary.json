@@ -1,0 +1,95 @@
+{
+  "analysis_date": "2025-09-09T13:00:07.403925",
+  "matching_statistics": {
+    "total_client_requirements": 547,
+    "successfully_matched": 264,
+    "match_rate": "48.3%",
+    "code_not_in_sql": 281,
+    "no_code_mapping": 2
+  },
+  "effort_estimates": {
+    "total_hours": 6376.0,
+    "average_hours": 24.151515151515152,
+    "by_category": [
+      {
+        "Category": "Built In Script",
+        "Total Instances": "328",
+        "Minutes per Instance": 20,
+        "Total Minutes": "6560",
+        "Total Hours": 109.33
+      },
+      {
+        "Category": "Extended",
+        "Total Instances": "90",
+        "Minutes per Instance": 5,
+        "Total Minutes": "450",
+        "Total Hours": 7.5
+      },
+      {
+        "Category": "If Statement",
+        "Total Instances": "4368",
+        "Minutes per Instance": 15,
+        "Total Minutes": "65520",
+        "Total Hours": 1092.0
+      },
+      {
+        "Category": "Precedent Script",
+        "Total Instances": "9464",
+        "Minutes per Instance": 30,
+        "Total Minutes": "283920",
+        "Total Hours": 4732.0
+      },
+      {
+        "Category": "Reflection",
+        "Total Instances": "1517",
+        "Minutes per Instance": 5,
+        "Total Minutes": "7585",
+        "Total Hours": 126.42
+      },
+      {
+        "Category": "Scripted",
+        "Total Instances": "346",
+        "Minutes per Instance": 30,
+        "Total Minutes": "10380",
+        "Total Hours": 173.0
+      },
+      {
+        "Category": "Search",
+        "Total Instances": "486",
+        "Minutes per Instance": 10,
+        "Total Minutes": "4860",
+        "Total Hours": 81.0
+      },
+      {
+        "Category": "Unbound",
+        "Total Instances": "478",
+        "Minutes per Instance": 5,
+        "Total Minutes": "2390",
+        "Total Hours": 39.83
+      }
+    ]
+  },
+  "complexity_distribution": [
+    {
+      "Complexity": "Simple",
+      "Count": 142,
+      "Percentage": "53.8%",
+      "Avg Hours": "0.66",
+      "Total Hours": "93.65"
+    },
+    {
+      "Complexity": "Moderate",
+      "Count": 68,
+      "Percentage": "25.8%",
+      "Avg Hours": "3.64",
+      "Total Hours": "247.77"
+    },
+    {
+      "Complexity": "Complex",
+      "Count": 38,
+      "Percentage": "14.4%",
+      "Avg Hours": "158.80",
+      "Total Hours": "6034.58"
+    }
+  ]
+}

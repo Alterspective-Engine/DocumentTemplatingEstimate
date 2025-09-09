@@ -1,0 +1,69 @@
+============================================================
+JSON DATA VALIDATION REPORT
+============================================================
+Generated: 2025-09-09 13:51:50
+
+FILE VALIDATION STATUS:
+----------------------------------------
+✅ documents.json: Valid
+✅ fields.json: Valid
+✅ documentfields.json: Valid
+✅ field_analysis.json: Valid
+✅ table_schemas.json: Valid
+✅ row_counts.json: Valid
+
+DATA STATISTICS:
+----------------------------------------
+total_documents: 782
+total_fields: 11,653
+total_relationships: 19,614
+unique_documents_with_fields: 641
+unique_fields_used: 11,649
+avg_fields_per_document: 25.08
+
+Field Categories:
+  - Precedent Script: 4,820
+  - If: 8,437
+  - Unbound: 617
+  - Search: 844
+  - Reflection: 4,033
+  - Scripted: 209
+  - Built In Script: 562
+  - Extended: 233
+
+FIELD TYPE ANALYSIS:
+----------------------------------------
+Total field entries: 19,755
+Unique field codes: 5,023
+Documents with analyzed fields: 782
+Null field codes: 141
+Null field results: 8,727
+
+Field Categories Breakdown:
+  - If: 8,437 (42.7%)
+  - Precedent Script: 4,820 (24.4%)
+  - Reflection: 4,033 (20.4%)
+  - Search: 844 (4.3%)
+  - Unbound: 617 (3.1%)
+  - Built In Script: 562 (2.8%)
+  - Extended: 233 (1.2%)
+  - Scripted: 209 (1.1%)
+
+STRUCTURE ISSUES:
+----------------------------------------
+⚠️  documents.json: Found 5477 NULL values (this is normal)
+⚠️  fields.json: Found 20241 NULL values (this is normal)
+⚠️  field_analysis.json: Found 8868 NULL values (this is normal)
+⚠️  table_schemas.json: Found 50 NULL values (this is normal)
+
+WARNINGS:
+----------------------------------------
+⚠️  141 documents have no associated fields
+⚠️  4 fields are not used in any document
+
+VALIDATION SUMMARY:
+----------------------------------------
+✅ Data is valid with minor warnings
+⚠️  6 warnings found (see above)
+
+============================================================

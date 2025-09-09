@@ -1,0 +1,151 @@
+{
+  "summary": {
+    "total_unmatched": 281,
+    "breakdown": {
+      "no_code_mapping": 2,
+      "has_code_no_sql": 0,
+      "code_in_folder_not_sql": 279,
+      "has_code_no_folder": 0,
+      "other": 0
+    },
+    "patterns": {
+      "sup": 211,
+      "suplit": 62,
+      "other": 6,
+      "tac": 2
+    },
+    "alternative_matches_found": 0
+  },
+  "no_code_mapping": [
+    {
+      "Title": "sup138a"
+    },
+    {
+      "Title": "WELSREF"
+    }
+  ],
+  "has_code_no_sql": [],
+  "code_in_folder_not_sql": [
+    {
+      "Title": "sup456",
+      "Code": "7387",
+      "InFolder": true,
+      "InSQL": false
+    },
+    {
+      "Title": "sup441b",
+      "Code": "15421",
+      "InFolder": true,
+      "InSQL": false
+    },
+    {
+      "Title": "sup092f",
+      "Code": "12619",
+      "InFolder": true,
+      "InSQL": false
+    },
+    {
+      "Title": "sup054b",
+      "Code": "15228",
+      "InFolder": true,
+      "InSQL": false
+    },
+    {
+      "Title": "sup233b",
+      "Code": "15236",
+      "InFolder": true,
+      "InSQL": false
+    },
+    {
+      "Title": "sup237",
+      "Code": "15237",
+      "InFolder": true,
+      "InSQL": false
+    },
+    {
+      "Title": "suplit10",
+      "Code": "15019",
+      "InFolder": true,
+      "InSQL": false
+    },
+    {
+      "Title": "suplit011",
+      "Code": "13698",
+      "InFolder": true,
+      "InSQL": false
+    },
+    {
+      "Title": "sup055",
+      "Code": "14369",
+      "InFolder": true,
+      "InSQL": false
+    },
+    {
+      "Title": "sup289",
+      "Code": "14854",
+      "InFolder": true,
+      "InSQL": false
+    },
+    {
+      "Title": "sup028a",
+      "Code": "6842",
+      "InFolder": true,
+      "InSQL": false
+    },
+    {
+      "Title": "sup028d",
+      "Code": "14933",
+      "InFolder": true,
+      "InSQL": false
+    },
+    {
+      "Title": "sup028b",
+      "Code": "6843",
+      "InFolder": true,
+      "InSQL": false
+    },
+    {
+      "Title": "sup028c",
+      "Code": "6844",
+      "InFolder": true,
+      "InSQL": false
+    },
+    {
+      "Title": "supfc2",
+      "Code": "13917",
+      "InFolder": true,
+      "InSQL": false
+    },
+    {
+      "Title": "sup054",
+      "Code": "15227",
+      "InFolder": true,
+      "InSQL": false
+    },
+    {
+      "Title": "sup059",
+      "Code": "15231",
+      "InFolder": true,
+      "InSQL": false
+    },
+    {
+      "Title": "sup057",
+      "Code": "15230",
+      "InFolder": true,
+      "InSQL": false
+    },
+    {
+      "Title": "sup056",
+      "Code": "15229",
+      "InFolder": true,
+      "InSQL": false
+    },
+    {
+      "Title": "sup637",
+      "Code": "16820",
+      "InFolder": true,
+      "InSQL": false
+    }
+  ],
+  "alternative_matches": []
+}

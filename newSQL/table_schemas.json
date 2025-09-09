@@ -1,0 +1,242 @@
+[
+  {
+    "TABLE_NAME": "DocumentFields",
+    "COLUMN_NAME": "DocumentID",
+    "DATA_TYPE": "int",
+    "CHARACTER_MAXIMUM_LENGTH": null,
+    "IS_NULLABLE": "NO",
+    "COLUMN_DEFAULT": null
+  },
+  {
+    "TABLE_NAME": "DocumentFields",
+    "COLUMN_NAME": "FieldID",
+    "DATA_TYPE": "int",
+    "CHARACTER_MAXIMUM_LENGTH": null,
+    "IS_NULLABLE": "NO",
+    "COLUMN_DEFAULT": null
+  },
+  {
+    "TABLE_NAME": "DocumentFields",
+    "COLUMN_NAME": "Count",
+    "DATA_TYPE": "int",
+    "CHARACTER_MAXIMUM_LENGTH": null,
+    "IS_NULLABLE": "NO",
+    "COLUMN_DEFAULT": null
+  },
+  {
+    "TABLE_NAME": "Documents",
+    "COLUMN_NAME": "DocumentID",
+    "DATA_TYPE": "int",
+    "CHARACTER_MAXIMUM_LENGTH": null,
+    "IS_NULLABLE": "NO",
+    "COLUMN_DEFAULT": null
+  },
+  {
+    "TABLE_NAME": "Documents",
+    "COLUMN_NAME": "Filename",
+    "DATA_TYPE": "nvarchar",
+    "CHARACTER_MAXIMUM_LENGTH": 255,
+    "IS_NULLABLE": "NO",
+    "COLUMN_DEFAULT": null
+  },
+  {
+    "TABLE_NAME": "Documents",
+    "COLUMN_NAME": "FileFullname",
+    "DATA_TYPE": "nvarchar",
+    "CHARACTER_MAXIMUM_LENGTH": 255,
+    "IS_NULLABLE": "YES",
+    "COLUMN_DEFAULT": null
+  },
+  {
+    "TABLE_NAME": "Documents",
+    "COLUMN_NAME": "CompatibilityMode",
+    "DATA_TYPE": "int",
+    "CHARACTER_MAXIMUM_LENGTH": null,
+    "IS_NULLABLE": "YES",
+    "COLUMN_DEFAULT": null
+  },
+  {
+    "TABLE_NAME": "Documents",
+    "COLUMN_NAME": "AttachedTemplate",
+    "DATA_TYPE": "nvarchar",
+    "CHARACTER_MAXIMUM_LENGTH": 50,
+    "IS_NULLABLE": "YES",
+    "COLUMN_DEFAULT": null
+  },
+  {
+    "TABLE_NAME": "Documents",
+    "COLUMN_NAME": "Protection",
+    "DATA_TYPE": "int",
+    "CHARACTER_MAXIMUM_LENGTH": null,
+    "IS_NULLABLE": "YES",
+    "COLUMN_DEFAULT": null
+  },
+  {
+    "TABLE_NAME": "Documents",
+    "COLUMN_NAME": "WorkSiteDatabase",
+    "DATA_TYPE": "nvarchar",
+    "CHARACTER_MAXIMUM_LENGTH": 50,
+    "IS_NULLABLE": "YES",
+    "COLUMN_DEFAULT": null
+  },
+  {
+    "TABLE_NAME": "Documents",
+    "COLUMN_NAME": "WorkSiteNumber",
+    "DATA_TYPE": "int",
+    "CHARACTER_MAXIMUM_LENGTH": null,
+    "IS_NULLABLE": "YES",
+    "COLUMN_DEFAULT": null
+  },
+  {
+    "TABLE_NAME": "Documents",
+    "COLUMN_NAME": "WorkSiteVersion",
+    "DATA_TYPE": "int",
+    "CHARACTER_MAXIMUM_LENGTH": null,
+    "IS_NULLABLE": "YES",
+    "COLUMN_DEFAULT": null
+  },
+  {
+    "TABLE_NAME": "Documents",
+    "COLUMN_NAME": "WorkSiteApplication",
+    "DATA_TYPE": "nvarchar",
+    "CHARACTER_MAXIMUM_LENGTH": 20,
+    "IS_NULLABLE": "YES",
+    "COLUMN_DEFAULT": null
+  },
+  {
+    "TABLE_NAME": "Documents",
+    "COLUMN_NAME": "WorkSiteName",
+    "DATA_TYPE": "nvarchar",
+    "CHARACTER_MAXIMUM_LENGTH": 255,
+    "IS_NULLABLE": "YES",
+    "COLUMN_DEFAULT": null
+  },
+  {
+    "TABLE_NAME": "Documents",
+    "COLUMN_NAME": "FileSize",
+    "DATA_TYPE": "int",
+    "CHARACTER_MAXIMUM_LENGTH": null,
+    "IS_NULLABLE": "YES",
+    "COLUMN_DEFAULT": null
+  },
+  {
+    "TABLE_NAME": "Documents",
+    "COLUMN_NAME": "FileCreateDate",
+    "DATA_TYPE": "datetime",
+    "CHARACTER_MAXIMUM_LENGTH": null,
+    "IS_NULLABLE": "YES",
+    "COLUMN_DEFAULT": null
+  },
+  {
+    "TABLE_NAME": "Documents",
+    "COLUMN_NAME": "FileModifyDate",
+    "DATA_TYPE": "datetime",
+    "CHARACTER_MAXIMUM_LENGTH": null,
+    "IS_NULLABLE": "YES",
+    "COLUMN_DEFAULT": null
+  },
+  {
+    "TABLE_NAME": "Documents",
+    "COLUMN_NAME": "TOC",
+    "DATA_TYPE": "bit",
+    "CHARACTER_MAXIMUM_LENGTH": null,
+    "IS_NULLABLE": "YES",
+    "COLUMN_DEFAULT": null
+  },
+  {
+    "TABLE_NAME": "Documents",
+    "COLUMN_NAME": "Checkboxes",
+    "DATA_TYPE": "int",
+    "CHARACTER_MAXIMUM_LENGTH": null,
+    "IS_NULLABLE": "YES",
+    "COLUMN_DEFAULT": null
+  },
+  {
+    "TABLE_NAME": "Documents",
+    "COLUMN_NAME": "REFFields",
+    "DATA_TYPE": "int",
+    "CHARACTER_MAXIMUM_LENGTH": null,
+    "IS_NULLABLE": "YES",
+    "COLUMN_DEFAULT": null
+  },
+  {
+    "TABLE_NAME": "Documents",
+    "COLUMN_NAME": "SEQFields",
+    "DATA_TYPE": "int",
+    "CHARACTER_MAXIMUM_LENGTH": null,
+    "IS_NULLABLE": "YES",
+    "COLUMN_DEFAULT": null
+  },
+  {
+    "TABLE_NAME": "Documents",
+    "COLUMN_NAME": "Tables",
+    "DATA_TYPE": "int",
+    "CHARACTER_MAXIMUM_LENGTH": null,
+    "IS_NULLABLE": "YES",
+    "COLUMN_DEFAULT": null
+  },
+  {
+    "TABLE_NAME": "Documents",
+    "COLUMN_NAME": "UpdateDate",
+    "DATA_TYPE": "datetime",
+    "CHARACTER_MAXIMUM_LENGTH": null,
+    "IS_NULLABLE": "YES",
+    "COLUMN_DEFAULT": null
+  },
+  {
+    "TABLE_NAME": "Documents",
+    "COLUMN_NAME": "AnalyseDate",
+    "DATA_TYPE": "datetime",
+    "CHARACTER_MAXIMUM_LENGTH": null,
+    "IS_NULLABLE": "YES",
+    "COLUMN_DEFAULT": null
+  },
+  {
+    "TABLE_NAME": "Documents",
+    "COLUMN_NAME": "StyleSet",
+    "DATA_TYPE": "nvarchar",
+    "CHARACTER_MAXIMUM_LENGTH": 255,
+    "IS_NULLABLE": "YES",
+    "COLUMN_DEFAULT": null
+  },
+  {
+    "TABLE_NAME": "Documents",
+    "COLUMN_NAME": "Sections",
+    "DATA_TYPE": "int",
+    "CHARACTER_MAXIMUM_LENGTH": null,
+    "IS_NULLABLE": "YES",
+    "COLUMN_DEFAULT": null
+  },
+  {
+    "TABLE_NAME": "Fields",
+    "COLUMN_NAME": "FieldID",
+    "DATA_TYPE": "int",
+    "CHARACTER_MAXIMUM_LENGTH": null,
+    "IS_NULLABLE": "NO",
+    "COLUMN_DEFAULT": null
+  },
+  {
+    "TABLE_NAME": "Fields",
+    "COLUMN_NAME": "FieldCode",
+    "DATA_TYPE": "nvarchar",
+    "CHARACTER_MAXIMUM_LENGTH": -1,
+    "IS_NULLABLE": "YES",
+    "COLUMN_DEFAULT": null
+  },
+  {
+    "TABLE_NAME": "Fields",
+    "COLUMN_NAME": "FieldResult",
+    "DATA_TYPE": "nvarchar",
+    "CHARACTER_MAXIMUM_LENGTH": -1,
+    "IS_NULLABLE": "YES",
+    "COLUMN_DEFAULT": null
+  },
+  {
+    "TABLE_NAME": "Fields",
+    "COLUMN_NAME": "DocAssistTagToConvertTo",
+    "DATA_TYPE": "nvarchar",
+    "CHARACTER_MAXIMUM_LENGTH": 255,
+    "IS_NULLABLE": "YES",
+    "COLUMN_DEFAULT": null
+  }
+]

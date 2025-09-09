@@ -1,0 +1,371 @@
+/* Import Alterspective Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Roboto:wght@300;400;500;700;900&display=swap');
+
+/* Material Design 3 Theme Variables - Alterspective Branding */
+:root {
+  /* Alterspective Brand Colors - From Visual Identity Guidelines */
+  --alterspective-navy: #17232D;
+  --alterspective-marine: #075156;
+  --alterspective-green: #2C8248;
+  --alterspective-citrus: #ABDD65;
+  --alterspective-pale-blue: #E5EEEF;
+  --alterspective-white: #FFFFFF;
+  
+  /* Legacy compatibility */
+  --alterspective-primary: var(--alterspective-green);
+  --alterspective-primary-light: var(--alterspective-citrus);
+  --alterspective-primary-lighter: var(--alterspective-pale-blue);
+  --alterspective-primary-lightest: var(--alterspective-pale-blue);
+  --alterspective-gray: var(--alterspective-marine);
+  --alterspective-gray-dark: var(--alterspective-navy);
+
+  /* Primary Colors - Alterspective Green */
+  --md-sys-color-primary: var(--alterspective-green);
+  --md-sys-color-on-primary: var(--alterspective-white);
+  --md-sys-color-primary-container: var(--alterspective-pale-blue);
+  --md-sys-color-on-primary-container: var(--alterspective-navy);
+
+  /* Secondary Colors - Alterspective Marine */
+  --md-sys-color-secondary: var(--alterspective-marine);
+  --md-sys-color-on-secondary: var(--alterspective-white);
+  --md-sys-color-secondary-container: var(--alterspective-pale-blue);
+  --md-sys-color-on-secondary-container: var(--alterspective-navy);
+
+  /* Tertiary Colors */
+  --md-sys-color-tertiary: #65558F;
+  --md-sys-color-on-tertiary: #FFFFFF;
+  --md-sys-color-tertiary-container: #E9DDFF;
+  --md-sys-color-on-tertiary-container: #201047;
+
+  /* Error Colors */
+  --md-sys-color-error: #BA1A1A;
+  --md-sys-color-on-error: #FFFFFF;
+  --md-sys-color-error-container: #FFDAD6;
+  --md-sys-color-on-error-container: #410002;
+
+  /* Success Colors - Alterspective Citrus */
+  --md-sys-color-success: var(--alterspective-citrus);
+  --md-sys-color-on-success: var(--alterspective-navy);
+  --md-sys-color-success-container: var(--alterspective-pale-blue);
+  --md-sys-color-on-success-container: var(--alterspective-green);
+
+  /* Warning Colors */
+  --md-sys-color-warning: #7D5700;
+  --md-sys-color-on-warning: #FFFFFF;
+  --md-sys-color-warning-container: #FFDEA5;
+  --md-sys-color-on-warning-container: #271900;
+
+  /* Surface Colors */
+  --md-sys-color-surface-dim: #D9D9DC;
+  --md-sys-color-surface: #FAFAFA;
+  --md-sys-color-surface-bright: var(--alterspective-white);
+  --md-sys-color-surface-container-lowest: var(--alterspective-white);
+  --md-sys-color-surface-container-low: #F3F3F6;
+  --md-sys-color-surface-container: #EDEDED;
+  --md-sys-color-surface-container-high: #E7E7EA;
+  --md-sys-color-surface-container-highest: #E2E2E5;
+
+  /* Background and Surface */
+  --md-sys-color-background: #FAFAFA;
+  --md-sys-color-on-background: var(--alterspective-gray-dark);
+  --md-sys-color-on-surface: var(--alterspective-gray-dark);
+  --md-sys-color-on-surface-variant: var(--alterspective-gray);
+  --md-sys-color-outline: var(--alterspective-gray);
+  --md-sys-color-outline-variant: var(--alterspective-primary-light);
+
+  /* Inverse Colors */
+  --md-sys-color-inverse-surface: var(--alterspective-gray-dark);
+  --md-sys-color-inverse-on-surface: var(--alterspective-white);
+  --md-sys-color-inverse-primary: var(--alterspective-primary-light);
+
+  /* Shadows */
+  --md-sys-color-shadow: rgba(0, 0, 0, 0.15);
+  --md-sys-color-scrim: rgba(0, 0, 0, 0.5);
+
+  /* Typography Scale - Alterspective Fonts (Chronicle Display primary, Montserrat secondary) */
+  --md-sys-typescale-display-large-font: 'Montserrat', sans-serif;
+  --md-sys-typescale-display-large-size: 57px;
+  --md-sys-typescale-display-large-line-height: 64px;
+  --md-sys-typescale-display-large-weight: 700;
+  
+  --md-sys-typescale-display-medium-font: 'Montserrat', sans-serif;
+  --md-sys-typescale-display-medium-size: 45px;
+  --md-sys-typescale-display-medium-line-height: 52px;
+  --md-sys-typescale-display-medium-weight: 600;
+  
+  --md-sys-typescale-display-small-font: 'Montserrat', sans-serif;
+  --md-sys-typescale-display-small-size: 36px;
+  --md-sys-typescale-display-small-line-height: 44px;
+  --md-sys-typescale-display-small-weight: 600;
+  
+  --md-sys-typescale-headline-large-font: 'Montserrat', sans-serif;
+  --md-sys-typescale-headline-large-size: 32px;
+  --md-sys-typescale-headline-large-line-height: 40px;
+  --md-sys-typescale-headline-large-weight: 600;
+  
+  --md-sys-typescale-headline-medium-font: 'Montserrat', sans-serif;
+  --md-sys-typescale-headline-medium-size: 28px;
+  --md-sys-typescale-headline-medium-line-height: 36px;
+  --md-sys-typescale-headline-medium-weight: 600;
+  
+  --md-sys-typescale-headline-small-font: 'Montserrat', sans-serif;
+  --md-sys-typescale-headline-small-size: 24px;
+  --md-sys-typescale-headline-small-line-height: 32px;
+  --md-sys-typescale-headline-small-weight: 600;
+  
+  --md-sys-typescale-title-large-font: 'Montserrat', sans-serif;
+  --md-sys-typescale-title-large-size: 22px;
+  --md-sys-typescale-title-large-line-height: 28px;
+  --md-sys-typescale-title-large-weight: 600;
+  
+  --md-sys-typescale-title-medium-font: 'Montserrat', sans-serif;
+  --md-sys-typescale-title-medium-size: 16px;
+  --md-sys-typescale-title-medium-line-height: 24px;
+  --md-sys-typescale-title-medium-weight: 600;
+  
+  --md-sys-typescale-title-small-font: 'Montserrat', sans-serif;
+  --md-sys-typescale-title-small-size: 14px;
+  --md-sys-typescale-title-small-line-height: 20px;
+  --md-sys-typescale-title-small-weight: 600;
+  
+  --md-sys-typescale-body-large-font: 'Roboto', sans-serif;
+  --md-sys-typescale-body-large-size: 16px;
+  --md-sys-typescale-body-large-line-height: 24px;
+  --md-sys-typescale-body-large-weight: 400;
+  
+  --md-sys-typescale-body-medium-font: 'Roboto', sans-serif;
+  --md-sys-typescale-body-medium-size: 14px;
+  --md-sys-typescale-body-medium-line-height: 20px;
+  --md-sys-typescale-body-medium-weight: 400;
+  
+  --md-sys-typescale-body-small-font: 'Roboto', sans-serif;
+  --md-sys-typescale-body-small-size: 12px;
+  --md-sys-typescale-body-small-line-height: 16px;
+  --md-sys-typescale-body-small-weight: 300;
+  
+  --md-sys-typescale-label-large-font: 'Roboto', sans-serif;
+  --md-sys-typescale-label-large-size: 14px;
+  --md-sys-typescale-label-large-line-height: 20px;
+  --md-sys-typescale-label-large-weight: 500;
+  
+  --md-sys-typescale-label-medium-font: 'Roboto', sans-serif;
+  --md-sys-typescale-label-medium-size: 12px;
+  --md-sys-typescale-label-medium-line-height: 16px;
+  --md-sys-typescale-label-medium-weight: 500;
+  
+  --md-sys-typescale-label-small-font: 'Roboto', sans-serif;
+  --md-sys-typescale-label-small-size: 11px;
+  --md-sys-typescale-label-small-line-height: 16px;
+  --md-sys-typescale-label-small-weight: 500;
+
+  /* Motion */
+  --md-sys-motion-easing-standard: cubic-bezier(0.2, 0, 0, 1);
+  --md-sys-motion-easing-emphasized: cubic-bezier(0.2, 0, 0, 1);
+  --md-sys-motion-easing-emphasized-decelerate: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --md-sys-motion-easing-emphasized-accelerate: cubic-bezier(0.3, 0, 0.8, 0.15);
+  
+  --md-sys-motion-duration-short1: 50ms;
+  --md-sys-motion-duration-short2: 100ms;
+  --md-sys-motion-duration-short3: 150ms;
+  --md-sys-motion-duration-short4: 200ms;
+  --md-sys-motion-duration-medium1: 250ms;
+  --md-sys-motion-duration-medium2: 300ms;
+  --md-sys-motion-duration-medium3: 350ms;
+  --md-sys-motion-duration-medium4: 400ms;
+  --md-sys-motion-duration-long1: 450ms;
+  --md-sys-motion-duration-long2: 500ms;
+  --md-sys-motion-duration-long3: 550ms;
+  --md-sys-motion-duration-long4: 600ms;
+
+  /* Spacing */
+  --md-sys-spacing-base: 8px;
+  --md-sys-spacing-xs: 4px;
+  --md-sys-spacing-sm: 8px;
+  --md-sys-spacing-md: 16px;
+  --md-sys-spacing-lg: 24px;
+  --md-sys-spacing-xl: 32px;
+  --md-sys-spacing-2xl: 48px;
+  --md-sys-spacing-3xl: 64px;
+
+  /* Border Radius */
+  --md-sys-shape-corner-none: 0px;
+  --md-sys-shape-corner-extra-small: 4px;
+  --md-sys-shape-corner-small: 8px;
+  --md-sys-shape-corner-medium: 12px;
+  --md-sys-shape-corner-large: 16px;
+  --md-sys-shape-corner-extra-large: 28px;
+  --md-sys-shape-corner-full: 9999px;
+
+  /* Elevation */
+  --md-sys-elevation-level0: 0px;
+  --md-sys-elevation-level1: 1px;
+  --md-sys-elevation-level2: 3px;
+  --md-sys-elevation-level3: 6px;
+  --md-sys-elevation-level4: 8px;
+  --md-sys-elevation-level5: 12px;
+}
+
+/* Glass Morphism Effects - Alterspective Style */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--alterspective-primary-lighter);
+  box-shadow: 0 8px 32px 0 rgba(45, 73, 0, 0.08);
+  border-radius: var(--md-sys-shape-corner-large);
+}
+
+.glass-card {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.9),
+    rgba(218, 255, 188, 0.1)
+  );
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: var(--md-sys-shape-corner-medium);
+  border: 1px solid var(--alterspective-primary-lightest);
+}
+
+.glass-modal {
+  background: rgba(250, 250, 250, 0.98);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--alterspective-primary-lighter);
+  box-shadow: 0 24px 48px 0 rgba(45, 73, 0, 0.12);
+  border-radius: var(--md-sys-shape-corner-extra-large);
+}
+
+/* Typography Classes with Alterspective Fonts */
+.display-large {
+  font-family: var(--md-sys-typescale-display-large-font);
+  font-size: var(--md-sys-typescale-display-large-size);
+  line-height: var(--md-sys-typescale-display-large-line-height);
+  font-weight: var(--md-sys-typescale-display-large-weight);
+}
+
+.display-medium {
+  font-family: var(--md-sys-typescale-display-medium-font);
+  font-size: var(--md-sys-typescale-display-medium-size);
+  line-height: var(--md-sys-typescale-display-medium-line-height);
+  font-weight: var(--md-sys-typescale-display-medium-weight);
+}
+
+.display-small {
+  font-family: var(--md-sys-typescale-display-small-font);
+  font-size: var(--md-sys-typescale-display-small-size);
+  line-height: var(--md-sys-typescale-display-small-line-height);
+  font-weight: var(--md-sys-typescale-display-small-weight);
+}
+
+.headline-large {
+  font-family: var(--md-sys-typescale-headline-large-font);
+  font-size: var(--md-sys-typescale-headline-large-size);
+  line-height: var(--md-sys-typescale-headline-large-line-height);
+  font-weight: var(--md-sys-typescale-headline-large-weight);
+}
+
+.headline-medium {
+  font-family: var(--md-sys-typescale-headline-medium-font);
+  font-size: var(--md-sys-typescale-headline-medium-size);
+  line-height: var(--md-sys-typescale-headline-medium-line-height);
+  font-weight: var(--md-sys-typescale-headline-medium-weight);
+}
+
+.headline-small {
+  font-family: var(--md-sys-typescale-headline-small-font);
+  font-size: var(--md-sys-typescale-headline-small-size);
+  line-height: var(--md-sys-typescale-headline-small-line-height);
+  font-weight: var(--md-sys-typescale-headline-small-weight);
+}
+
+.title-large {
+  font-family: var(--md-sys-typescale-title-large-font);
+  font-size: var(--md-sys-typescale-title-large-size);
+  line-height: var(--md-sys-typescale-title-large-line-height);
+  font-weight: var(--md-sys-typescale-title-large-weight);
+}
+
+.title-medium {
+  font-family: var(--md-sys-typescale-title-medium-font);
+  font-size: var(--md-sys-typescale-title-medium-size);
+  line-height: var(--md-sys-typescale-title-medium-line-height);
+  font-weight: var(--md-sys-typescale-title-medium-weight);
+}
+
+.title-small {
+  font-family: var(--md-sys-typescale-title-small-font);
+  font-size: var(--md-sys-typescale-title-small-size);
+  line-height: var(--md-sys-typescale-title-small-line-height);
+  font-weight: var(--md-sys-typescale-title-small-weight);
+}
+
+.body-large {
+  font-family: var(--md-sys-typescale-body-large-font);
+  font-size: var(--md-sys-typescale-body-large-size);
+  line-height: var(--md-sys-typescale-body-large-line-height);
+  font-weight: var(--md-sys-typescale-body-large-weight);
+}
+
+.body-medium {
+  font-family: var(--md-sys-typescale-body-medium-font);
+  font-size: var(--md-sys-typescale-body-medium-size);
+  line-height: var(--md-sys-typescale-body-medium-line-height);
+  font-weight: var(--md-sys-typescale-body-medium-weight);
+}
+
+.body-small {
+  font-family: var(--md-sys-typescale-body-small-font);
+  font-size: var(--md-sys-typescale-body-small-size);
+  line-height: var(--md-sys-typescale-body-small-line-height);
+  font-weight: var(--md-sys-typescale-body-small-weight);
+}
+
+.label-large {
+  font-family: var(--md-sys-typescale-label-large-font);
+  font-size: var(--md-sys-typescale-label-large-size);
+  line-height: var(--md-sys-typescale-label-large-line-height);
+  font-weight: var(--md-sys-typescale-label-large-weight);
+}
+
+.label-medium {
+  font-family: var(--md-sys-typescale-label-medium-font);
+  font-size: var(--md-sys-typescale-label-medium-size);
+  line-height: var(--md-sys-typescale-label-medium-line-height);
+  font-weight: var(--md-sys-typescale-label-medium-weight);
+}
+
+.label-small {
+  font-family: var(--md-sys-typescale-label-small-font);
+  font-size: var(--md-sys-typescale-label-small-size);
+  line-height: var(--md-sys-typescale-label-small-line-height);
+  font-weight: var(--md-sys-typescale-label-small-weight);
+}
+
+/* Utility Classes */
+.surface-container {
+  background-color: var(--md-sys-color-surface-container);
+  color: var(--md-sys-color-on-surface);
+}
+
+.surface-container-high {
+  background-color: var(--md-sys-color-surface-container-high);
+  color: var(--md-sys-color-on-surface);
+}
+
+.surface-container-highest {
+  background-color: var(--md-sys-color-surface-container-highest);
+  color: var(--md-sys-color-on-surface);
+}
+
+.elevation-1 {
+  box-shadow: 0 var(--md-sys-elevation-level1) calc(var(--md-sys-elevation-level1) * 2) 0 rgba(0, 0, 0, 0.15);
+}
+
+.elevation-2 {
+  box-shadow: 0 var(--md-sys-elevation-level2) calc(var(--md-sys-elevation-level2) * 2) 0 rgba(0, 0, 0, 0.15);
+}
+
+.elevation-3 {
+  box-shadow: 0 var(--md-sys-elevation-level3) calc(var(--md-sys-elevation-level3) * 2) 0 rgba(0, 0, 0, 0.15);
+}

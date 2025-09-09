@@ -1,0 +1,71 @@
+{
+  "total_documents": 782,
+  "superannuation_documents": 6,
+  "percentage": 0.77,
+  "field_statistics": {
+    "total_fields": 504,
+    "average_fields_per_doc": 84.0,
+    "field_categories": {
+      "If": 272,
+      "Unbound": 2,
+      "Search": 6,
+      "Precedent Script": 140,
+      "Reflection": 73,
+      "Scripted": 4,
+      "Built In Script": 7
+    }
+  },
+  "file_types": {
+    "dot": 6
+  },
+  "document_list": [
+    {
+      "DocumentID": 2,
+      "Filename": "sup021c.dot",
+      "FileSize": 62464,
+      "FileCreateDate": "2025-08-14T10:41:52",
+      "FileModifyDate": "2025-08-18T11:26:09.640000",
+      "FieldCount": 2
+    },
+    {
+      "DocumentID": 3,
+      "Filename": "sup074.dot",
+      "FileSize": 56832,
+      "FileCreateDate": "2025-08-14T10:39:40",
+      "FileModifyDate": "2025-08-18T11:26:09.627000",
+      "FieldCount": 2
+    },
+    {
+      "DocumentID": 4,
+      "Filename": "sup077b.dot",
+      "FileSize": 65536,
+      "FileCreateDate": "2025-08-14T10:42:52",
+      "FileModifyDate": "2025-08-18T11:26:09.610000",
+      "FieldCount": 37
+    },
+    {
+      "DocumentID": 5,
+      "Filename": "sup527.dot",
+      "FileSize": 143872,
+      "FileCreateDate": "2025-08-14T10:40:22",
+      "FileModifyDate": "2025-08-18T11:26:09.597000",
+      "FieldCount": 4
+    },
+    {
+      "DocumentID": 6,
+      "Filename": "sup610.dot",
+      "FileSize": 718848,
+      "FileCreateDate": "2025-08-14T10:43:30",
+      "FileModifyDate": "2025-08-18T11:26:09.567000",
+      "FieldCount": 245
+    },
+    {
+      "DocumentID": 7,
+      "Filename": "sup631.dot",
+      "FileSize": 701952,
+      "FileCreateDate": "2025-08-14T10:44:04",
+      "FileModifyDate": "2025-08-18T11:26:09.533000",
+      "FieldCount": 214
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "total_client_requirements": 547,
+  "sql_documents": 782,
+  "direct_matches": 9,
+  "match_rate": "1.6%",
+  "documents_with_field_data": 641,
+  "total_fields": 11653,
+  "total_field_mappings": 19614,
+  "field_categories": {
+    "IF Statements": 9215,
+    "Document Variables": 2317,
+    "Merge Fields": 45,
+    "Include Text": 0,
+    "References": 0,
+    "Precedent Scripts": 0,
+    "Other": 76
+  }
+}

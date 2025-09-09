@@ -1,0 +1,315 @@
+/* Alterspective Header with Geometric Pattern Background */
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: linear-gradient(135deg, var(--alterspective-navy) 0%, var(--alterspective-marine) 100%);
+  box-shadow: 0 4px 24px rgba(23, 35, 45, 0.15);
+  overflow: hidden;
+  position: relative;
+}
+
+/* Geometric Pattern Overlay - Inspired by Brand Guidelines */
+.app-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -200px;
+  width: 800px;
+  height: 100%;
+  background-image: 
+    linear-gradient(45deg, transparent 30%, var(--alterspective-citrus) 30%, var(--alterspective-citrus) 30.5%, transparent 30.5%),
+    linear-gradient(-45deg, transparent 30%, var(--alterspective-green) 30%, var(--alterspective-green) 30.5%, transparent 30.5%),
+    linear-gradient(135deg, transparent 40%, rgba(171, 221, 101, 0.1) 40%, rgba(171, 221, 101, 0.1) 40.5%, transparent 40.5%);
+  background-size: 100px 100px, 100px 100px, 150px 150px;
+  opacity: 0.15;
+  animation: geometricFloat 20s ease-in-out infinite;
+}
+
+@keyframes geometricFloat {
+  0%, 100% { transform: translateX(0) translateY(0); }
+  50% { transform: translateX(30px) translateY(-10px); }
+}
+
+.header-container {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: var(--md-sys-spacing-lg) var(--md-sys-spacing-xl);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--md-sys-spacing-xl);
+  position: relative;
+  z-index: 1;
+}
+
+/* Brand Section */
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--md-sys-spacing-lg);
+}
+
+.brand-logo {
+  height: 40px;
+  width: auto;
+  filter: brightness(0) invert(1);
+  transition: transform 0.3s ease;
+}
+
+.brand-logo:hover {
+  transform: scale(1.05);
+}
+
+.brand-divider {
+  width: 2px;
+  height: 48px;
+  background: linear-gradient(180deg, 
+    transparent 0%, 
+    var(--alterspective-citrus) 20%, 
+    var(--alterspective-citrus) 80%, 
+    transparent 100%);
+  opacity: 0.5;
+}
+
+.app-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.app-title {
+  margin: 0;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 28px;
+  color: var(--alterspective-white);
+  letter-spacing: -0.5px;
+}
+
+.app-subtitle {
+  margin: 0;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 13px;
+  color: var(--alterspective-citrus);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  opacity: 0.9;
+}
+
+/* Navigation - Premium Glass Effect */
+.header-nav {
+  display: flex;
+  gap: var(--md-sys-spacing-xs);
+  flex: 1;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: var(--md-sys-shape-corner-full);
+  padding: var(--md-sys-spacing-xs);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: var(--md-sys-spacing-sm);
+  padding: var(--md-sys-spacing-sm) var(--md-sys-spacing-lg);
+  color: var(--alterspective-white);
+  text-decoration: none;
+  border-radius: var(--md-sys-shape-corner-full);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.nav-link::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: var(--alterspective-citrus);
+  transform: translate(-50%, -50%);
+  transition: width 0.3s ease, height 0.3s ease;
+  opacity: 0.2;
+}
+
+.nav-link:hover {
+  color: var(--alterspective-navy);
+  background: rgba(171, 221, 101, 0.9);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(171, 221, 101, 0.3);
+}
+
+.nav-link:hover::before {
+  width: 100%;
+  height: 100%;
+}
+
+.nav-link.active {
+  background: var(--alterspective-citrus);
+  color: var(--alterspective-navy);
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(171, 221, 101, 0.4);
+}
+
+.calculator-btn {
+  background: rgba(44, 130, 72, 0.2);
+  border: 1px solid var(--alterspective-green);
+  color: var(--alterspective-citrus);
+}
+
+.calculator-btn:hover {
+  background: var(--alterspective-green);
+  color: var(--alterspective-white);
+  border-color: var(--alterspective-green);
+  transform: translateY(-2px) scale(1.05);
+}
+
+/* Header Stats - Modern Card Design */
+.header-stats {
+  display: flex;
+  gap: var(--md-sys-spacing-md);
+  align-items: center;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: var(--md-sys-spacing-sm);
+  padding: var(--md-sys-spacing-sm) var(--md-sys-spacing-md);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: var(--md-sys-shape-corner-medium);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.stat-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.stat-item svg {
+  color: var(--alterspective-citrus);
+}
+
+.stat-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.confidence-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  position: relative;
+}
+
+.confidence-indicator::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 8px;
+  height: 8px;
+  background: var(--alterspective-citrus);
+  border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.5); opacity: 0.5; }
+}
+
+.stat-value {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+  color: var(--alterspective-white);
+  line-height: 1;
+}
+
+.stat-label {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 10px;
+  color: var(--alterspective-citrus);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.8;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .header-container {
+    padding: var(--md-sys-spacing-md) var(--md-sys-spacing-lg);
+  }
+  
+  .app-title {
+    font-size: 24px;
+  }
+  
+  .app-subtitle {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .header-container {
+    flex-wrap: wrap;
+  }
+  
+  .header-nav {
+    order: 3;
+    width: 100%;
+    margin-top: var(--md-sys-spacing-md);
+  }
+  
+  .header-stats {
+    margin-left: auto;
+  }
+}
+
+@media (max-width: 640px) {
+  .brand-divider {
+    display: none;
+  }
+  
+  .app-subtitle {
+    display: none;
+  }
+  
+  .app-title {
+    font-size: 20px;
+  }
+  
+  .nav-link span {
+    display: none;
+  }
+  
+  .stat-label {
+    display: none;
+  }
+  
+  .stat-value {
+    font-size: 16px;
+  }
+  
+  .brand-logo {
+    height: 32px;
+  }
+}

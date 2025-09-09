@@ -1,8 +1,6 @@
 # AI Agent Development Guidelines (Shared)
 
-Reference Architecture: Agents must follow the system structure defined in `docs/ARCHITECTURE.md` (routing, integration, and no-orphaned-files policy).
-
-This shared document consolidates the core standards for all AI agents (Claude, GPT, Copilot, etc.) working on the EstimateDoc project. Agent-specific prompt patterns may live in separate files (e.g., `CLAUDE.md`) but must adhere to these shared rules.
+This shared document consolidates the core standards for all AI agents (Claude, GPT, Copilot, etc.) working on the EstimateDoc project. Agent-specific prompt patterns may live in separate files but must adhere to these shared rules.
 
 ## 1. Code Quality Standards
 

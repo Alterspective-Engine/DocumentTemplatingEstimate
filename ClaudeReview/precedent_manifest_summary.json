@@ -1,0 +1,22 @@
+{
+  "total_client_requirements": 547,
+  "total_precedents_parsed": 148,
+  "match_statistics": {
+    "exact_title": 106,
+    "lowercase_title": 0,
+    "clean_title": 0,
+    "folder_name": 0,
+    "partial_match": 4,
+    "no_match": 437
+  },
+  "total_matched": 110,
+  "match_rate": "20.1%",
+  "precedents_with_preview": 142,
+  "scripts_parsed": 0,
+  "field_type_summary": {
+    "IF_statements": 0,
+    "DOCVARIABLE": 0,
+    "SELECT": 1,
+    "ASSOC": 7
+  }
+}

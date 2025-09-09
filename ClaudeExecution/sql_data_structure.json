@@ -1,0 +1,40 @@
+{
+  "dbo_DocumentFields": {
+    "type": "dict",
+    "keys": [
+      "metadata",
+      "data"
+    ]
+  },
+  "dbo_Fields": {
+    "type": "dict",
+    "keys": [
+      "metadata",
+      "data"
+    ]
+  },
+  "combined_analysis": {
+    "type": "dict",
+    "keys": [
+      "metadata",
+      "statistics",
+      "sample_relationships"
+    ]
+  },
+  "export_summary": {
+    "type": "dict",
+    "keys": [
+      "export_summary",
+      "table_configuration",
+      "validation_report",
+      "export_details"
+    ]
+  },
+  "dbo_Documents": {
+    "type": "dict",
+    "keys": [
+      "metadata",
+      "data"
+    ]
+  }
+}

@@ -1,0 +1,125 @@
+[
+  {
+    "table": "Documents",
+    "schema_columns": [
+      "AnalyseDate",
+      "AttachedTemplate",
+      "Checkboxes",
+      "CompatibilityMode",
+      "DocumentID",
+      "FileCreateDate",
+      "FileFullname",
+      "FileModifyDate",
+      "FileSize",
+      "Filename",
+      "Protection",
+      "REFFields",
+      "SEQFields",
+      "Sections",
+      "StyleSet",
+      "TOC",
+      "Tables",
+      "UpdateDate",
+      "WorkSiteApplication",
+      "WorkSiteDatabase",
+      "WorkSiteName",
+      "WorkSiteNumber",
+      "WorkSiteVersion"
+    ],
+    "json_columns": [
+      "AnalyseDate",
+      "AttachedTemplate",
+      "Checkboxes",
+      "CompatibilityMode",
+      "DocumentID",
+      "FileCreateDate",
+      "FileFullname",
+      "FileModifyDate",
+      "FileSize",
+      "Filename",
+      "Protection",
+      "REFFields",
+      "SEQFields",
+      "Sections",
+      "StyleSet",
+      "TOC",
+      "Tables",
+      "UpdateDate",
+      "WorkSiteApplication",
+      "WorkSiteDatabase",
+      "WorkSiteName",
+      "WorkSiteNumber",
+      "WorkSiteVersion"
+    ],
+    "missing": [],
+    "extra": [],
+    "matched": [
+      "AnalyseDate",
+      "AttachedTemplate",
+      "Checkboxes",
+      "CompatibilityMode",
+      "DocumentID",
+      "FileCreateDate",
+      "FileFullname",
+      "FileModifyDate",
+      "FileSize",
+      "Filename",
+      "Protection",
+      "REFFields",
+      "SEQFields",
+      "Sections",
+      "StyleSet",
+      "TOC",
+      "Tables",
+      "UpdateDate",
+      "WorkSiteApplication",
+      "WorkSiteDatabase",
+      "WorkSiteName",
+      "WorkSiteNumber",
+      "WorkSiteVersion"
+    ]
+  },
+  {
+    "table": "Fields",
+    "schema_columns": [
+      "DocAssistTagToConvertTo",
+      "FieldCode",
+      "FieldID",
+      "FieldResult"
+    ],
+    "json_columns": [
+      "DocAssistTagToConvertTo",
+      "FieldCode",
+      "FieldID",
+      "FieldResult"
+    ],
+    "missing": [],
+    "extra": [],
+    "matched": [
+      "DocAssistTagToConvertTo",
+      "FieldCode",
+      "FieldID",
+      "FieldResult"
+    ]
+  },
+  {
+    "table": "DocumentFields",
+    "schema_columns": [
+      "Count",
+      "DocumentID",
+      "FieldID"
+    ],
+    "json_columns": [
+      "Count",
+      "DocumentID",
+      "FieldID"
+    ],
+    "missing": [],
+    "extra": [],
+    "matched": [
+      "Count",
+      "DocumentID",
+      "FieldID"
+    ]
+  }
+]

@@ -1,0 +1,104 @@
+.app {
+  min-height: 100vh;
+  background: var(--md-sys-color-background);
+  color: var(--md-sys-color-on-background);
+  display: flex;
+  flex-direction: column;
+  font-family: 'Roboto', sans-serif;
+}
+
+.app-main {
+  flex: 1;
+  width: 100%;
+  background: var(--alterspective-pale-blue);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Alterspective Geometric Pattern Background */
+.app-main::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    linear-gradient(60deg, transparent 40%, rgba(44, 130, 72, 0.03) 40%, rgba(44, 130, 72, 0.03) 60%, transparent 60%),
+    linear-gradient(-60deg, transparent 40%, rgba(7, 81, 86, 0.03) 40%, rgba(7, 81, 86, 0.03) 60%, transparent 60%),
+    linear-gradient(120deg, transparent 30%, rgba(171, 221, 101, 0.02) 30%, rgba(171, 221, 101, 0.02) 70%, transparent 70%);
+  background-size: 200px 200px, 200px 200px, 300px 300px;
+  animation: geometricShift 30s linear infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes geometricShift {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(100px, 100px); }
+}
+
+.app-main > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* CSS Variables for RGB values (for transparency) - Alterspective */
+:root {
+  --md-sys-color-primary-rgb: 45, 73, 0;
+  --md-sys-color-secondary-rgb: 87, 87, 87;
+  --md-sys-color-tertiary-rgb: 101, 85, 143;
+  --md-sys-color-surface-rgb: 250, 250, 250;
+}
+
+/* Scrollbar Styling - Alterspective */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--alterspective-primary-lightest);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--alterspective-primary-light);
+  border-radius: var(--md-sys-shape-corner-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--alterspective-primary);
+}
+
+/* Selection - Alterspective */
+::selection {
+  background: var(--alterspective-primary-lighter);
+  color: var(--alterspective-primary);
+}
+
+/* Focus Visible - Alterspective */
+:focus-visible {
+  outline: 2px solid var(--alterspective-primary);
+  outline-offset: 2px;
+}
+
+/* Loading Animation */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.skeleton {
+  animation: shimmer 2s infinite;
+  background: linear-gradient(
+    90deg,
+    var(--md-sys-color-surface-container) 0%,
+    var(--md-sys-color-surface-container-high) 50%,
+    var(--md-sys-color-surface-container) 100%
+  );
+  background-size: 1000px 100%;
+}

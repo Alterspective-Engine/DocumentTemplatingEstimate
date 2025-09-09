@@ -1,0 +1,16 @@
+{
+  "analysis_date": "2025-09-09T13:48:24.009122",
+  "total_client_requirements": 547,
+  "total_codes_in_main_manifest": 858,
+  "total_precedent_folders_parsed": 148,
+  "matching_statistics": {
+    "no_match": 436,
+    "direct_name": 107,
+    "main_manifest_title": 1,
+    "partial": 3
+  },
+  "total_matched": 111,
+  "match_rate": "20.3%",
+  "templates_with_field_data": 101,
+  "total_estimated_hours": 0.67
+}

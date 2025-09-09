@@ -1,0 +1,49 @@
+{
+  "analysis_date": "2025-09-09T13:09:20.646841",
+  "data_source": "New SQL Export (newSQL directory)",
+  "matching_stats": {
+    "total_requirements": 547,
+    "direct_matches": 9,
+    "code_matches": 257,
+    "total_matched": 266,
+    "match_rate": "48.6%"
+  },
+  "effort_summary": {
+    "total_hours": 2221.26,
+    "average_hours": 8.3506015037594,
+    "documents_with_data": 266
+  },
+  "field_categories": {
+    "Precedent Script": 4820,
+    "If": 8437,
+    "Unbound": 617,
+    "Search": 844,
+    "Reflection": 4033,
+    "Scripted": 209,
+    "Built In Script": 562,
+    "Extended": 233
+  },
+  "complexity_distribution": [
+    {
+      "Complexity": "Simple",
+      "Count": 176,
+      "Percentage": "66.2%",
+      "Avg Hours": 0.6668181818181819,
+      "Total Hours": 117.36000000000001
+    },
+    {
+      "Complexity": "Moderate",
+      "Count": 57,
+      "Percentage": "21.4%",
+      "Avg Hours": 3.1029824561403503,
+      "Total Hours": 176.86999999999998
+    },
+    {
+      "Complexity": "Complex",
+      "Count": 33,
+      "Percentage": "12.4%",
+      "Avg Hours": 58.394848484848474,
+      "Total Hours": 1927.0299999999997
+    }
+  ]
+}

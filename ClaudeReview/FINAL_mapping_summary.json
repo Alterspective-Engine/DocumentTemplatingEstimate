@@ -1,0 +1,16 @@
+{
+  "total_client_requirements": 547,
+  "total_matched": 545,
+  "match_rate_pct": 99.6,
+  "matches_with_sql_data": 266,
+  "sql_match_rate_pct": 48.6,
+  "total_estimated_hours": 2221.0,
+  "match_type_breakdown": {
+    "manifest_only": 279,
+    "manifest_to_sql": 257,
+    "sql_direct": 9,
+    "no_match": 2
+  },
+  "unmatched_count": 2,
+  "found_in_unlisted_folders": 0
+}

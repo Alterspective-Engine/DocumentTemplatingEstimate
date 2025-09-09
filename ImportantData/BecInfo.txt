@@ -1,0 +1,60 @@
+
+tcp:mosmar-cip.database.windows.net,1433
+SQL server authentication
+Username:  mosmaradmin
+Password:  I’ll txt you
+Database:  Mosmar_CIP_Dev
+ 
+Core tables:
+Documents
+Fields
+DocumentFields
+ 
+I wrote this query so I can start to see the different types of fields:
+
+SELECT
+    DOC.documentid,
+    filename,
+    fieldcode,
+    fieldresult,
+    CASE
+        WHEN fieldcode LIKE '%UDSCH%' THEN 'Search'
+        WHEN fieldcode LIKE '%~%' THEN 'Reflection'
+        WHEN fieldcode LIKE '%IF%' THEN 'If'
+        WHEN fieldcode LIKE '%DOCVARIABLE "#%' THEN 'Built In Script'
+        WHEN fieldcode LIKE '%$$%' THEN 'Extended'
+        WHEN fieldcode LIKE '%SCR%' THEN 'Scripted'
+        WHEN fieldcode LIKE '%\_%' ESCAPE '\' THEN 'Unbound'  -- Contains underscore
+        ELSE 'Precedent Script'
+    END AS field_category
+FROM
+    documents DOC
+LEFT JOIN
+    DocumentFields DF ON DOC.DocumentID = DF.DocumentID
+LEFT JOIN
+    fields F ON F.fieldid = DF.FieldID;
+Search Fields are where they are selecting from a list of items, usually selecting a participant on the matter. IE return the Legal Assistant(s) on the matter or the Client(s).  Handles one to many.
+Reflection Fields are built in fields that ‘reflect’ through the object model.  IE ~file.[blah] is a built in field on the matter.  ~associate.[blah] is a built in field on the participant. 
+If statement is obvious
+Built in scripts are where Mattersphere has provided some ‘helper’ scripts – we can’t see the code to know what they do though (annoying)
+Extended Data Fields are where they’ve extended the core object such as File and Associate and Contact.  These would be our form builder fields.  But they actually link them to an object layer rather than letting them be freeform like ShareDo.
+Scripted fields are where there is some C# script inside Mattersphere that runs and outputs a string.  We have to dig into MatterSphere to read each of the scripts.  These can be used across multiple precedents.
+Unbound fields are fields that are on a document questionnaire – so they’re not stored in the database
+Precedent script is where a script has been written in c# specifically for the precedent and it outputs a range of fields to use in the document.
+ 
+So I think we need to put some time on each of the elements.  IE:
+ 
+Reflection field is easy  - maybe 5 minutes to add one
+Extended data field is also easy – maybe 5 minutes to add one (on the assumption that the form builder is already created)
+Unbound fields are easy once the questionnaire is built – so we could say 5 minutes to add the field and 15 minutes to create the form?
+Search fields may be easy or may not depending on the search list being used.  So I’d make that say 10 mins per field? 
+If statements are essentially display rules.  They may be nested or pretty standard.  For each IF statement we’d need to write a Display rule – maybe 15 minutes per display rule? 
+Scripted fields and precedent scripts are complex
+Need to reach each scripted field or precedent script
+Decide on whether it can be resolved with an existing ShareDo field
+Or create a calculated field. 
+Not sure how to estimate this one
+ 
+These are all just guestimates on the best way to tackle this….
+ 
+ 
