@@ -1,0 +1,311 @@
+{
+  "metadata": {
+    "description": "Combined dataset showing document-field relationships",
+    "created": "2025-09-08T23:01:10.948900",
+    "total_documents": 782,
+    "total_fields": 11653,
+    "total_relationships": 19614
+  },
+  "statistics": {
+    "documents_with_fields": 641,
+    "fields_used": 11649,
+    "average_fields_per_document": 16.666666666666668,
+    "most_used_fields": [
+      {
+        "field_id": 11,
+        "field_code": " DOCVARIABLE \"!udSchFilAssist;;1;select assistant to whom queries to be directed;USRFULLNAME\"  ",
+        "usage_count": 2
+      },
+      {
+        "field_id": 12,
+        "field_code": " DOCVARIABLE \"!udSchFilAssist;;1;select assistant to whom queries to be directed;USRDDI\"  ",
+        "usage_count": 2
+      },
+      {
+        "field_id": 3,
+        "field_code": " banana ",
+        "usage_count": 1
+      },
+      {
+        "field_id": 4,
+        "field_code": " MERGEFIELD  banana \\* Caps  \\* MERGEFORMAT ",
+        "usage_count": 1
+      },
+      {
+        "field_id": 7,
+        "field_code": " test field ",
+        "usage_count": 1
+      },
+      {
+        "field_id": 8,
+        "field_code": " MERGEFIELD  testing  \\* MERGEFORMAT ",
+        "usage_count": 1
+      },
+      {
+        "field_id": 9,
+        "field_code": " If \u0013 DOCVARIABLE \"_claim\" \\* MERGEFORMAT \u0015=\"S\" \"In order to have AFCA consider your complaint, you need to have lodged your claim to the Super Fund within two years of you permanently ceasing employment due to your injuries.\rFurther, if you have received a final decision from the Fund, you must lodge a complaint to AFCA within four years of the Fund\u2019s decision.  If you have not received a final decision from the Fund, but you have complained about the Fund\u2019s conduct, you must lodge a complaint to AFCA within two years from the Fund\u2019s response.\r\" \"You must lodge your complaint with AFCA within six years from the date you became aware (or should have become aware) of your right to the claimed benefit.  If you have already complained to the Insurer, then you must lodge a complaint to AFCA within two years of the Insurer\u2019s response.  The earlier of these two dates is the date you must comply with.\r\" ",
+        "usage_count": 1
+      },
+      {
+        "field_id": 10,
+        "field_code": " DOCVARIABLE \"_claim\" \\* MERGEFORMAT ",
+        "usage_count": 1
+      },
+      {
+        "field_id": 13,
+        "field_code": " IF \u0013 DOCVARIABLE \"!aa) is this letter for a superannuation death benefit claim file?\"  \u0015 = \"y\" \"Could you also please advise us of the details of any other claims made with respect to the death benefit, including the names of the claimants.\r\r\" \"\" ",
+        "usage_count": 1
+      },
+      {
+        "field_id": 14,
+        "field_code": " DOCVARIABLE \"!aa) is this letter for a superannuation death benefit claim file?\"  ",
+        "usage_count": 1
+      }
+    ],
+    "documents_by_extension": {
+      "None": 782
+    }
+  },
+  "sample_relationships": [
+    {
+      "document": {
+        "DocumentID": 1,
+        "Filename": "test doc.docx"
+      },
+      "field": {
+        "FieldID": 3,
+        "FieldCode": " banana ",
+        "FieldResult": "Error! Bookmark not defined."
+      },
+      "instance_count": 1
+    },
+    {
+      "document": {
+        "DocumentID": 1,
+        "Filename": "test doc.docx"
+      },
+      "field": {
+        "FieldID": 4,
+        "FieldCode": " MERGEFIELD  banana \\* Caps  \\* MERGEFORMAT ",
+        "FieldResult": "\u00abBanana\u00bb"
+      },
+      "instance_count": 1
+    },
+    {
+      "document": {
+        "DocumentID": 1,
+        "Filename": "test doc.docx"
+      },
+      "field": {
+        "FieldID": 7,
+        "FieldCode": " test field ",
+        "FieldResult": null
+      },
+      "instance_count": 1
+    },
+    {
+      "document": {
+        "DocumentID": 1,
+        "Filename": "test doc.docx"
+      },
+      "field": {
+        "FieldID": 8,
+        "FieldCode": " MERGEFIELD  testing  \\* MERGEFORMAT ",
+        "FieldResult": "\u00abtesting\u00bb"
+      },
+      "instance_count": 1
+    },
+    {
+      "document": {
+        "DocumentID": 2,
+        "Filename": "sup021c.dot"
+      },
+      "field": {
+        "FieldID": 9,
+        "FieldCode": " If \u0013 DOCVARIABLE \"_claim\" \\* MERGEFORMAT \u0015=\"S\" \"In order to have AFCA consider your complaint, you need to have lodged your claim to the Super Fund within two years of you permanently ceasing employment due to your injuries.\rFurther, if you have received a final decision from the Fund, you must lodge a complaint to AFCA within four years of the Fund\u2019s decision.  If you have not received a final decision from the Fund, but you have complained about the Fund\u2019s conduct, you must lodge a complaint to AFCA within two years from the Fund\u2019s response.\r\" \"You must lodge your complaint with AFCA within six years from the date you became aware (or should have become aware) of your right to the claimed benefit.  If you have already complained to the Insurer, then you must lodge a complaint to AFCA within two years of the Insurer\u2019s response.  The earlier of these two dates is the date you must comply with.\r\" ",
+        "FieldResult": "You must lodge your complaint with AFCA within six years from the date you became aware (or should have become aware) of your right to the claimed benefit.  If you have already complained to the Insurer, then you must lodge a complaint to AFCA within two years of the Insurer\u2019s response.  The earlier of these two dates is the date you must comply with.\r"
+      },
+      "instance_count": 1
+    },
+    {
+      "document": {
+        "DocumentID": 2,
+        "Filename": "sup021c.dot"
+      },
+      "field": {
+        "FieldID": 10,
+        "FieldCode": " DOCVARIABLE \"_claim\" \\* MERGEFORMAT ",
+        "FieldResult": " "
+      },
+      "instance_count": 1
+    },
+    {
+      "document": {
+        "DocumentID": 3,
+        "Filename": "sup074.dot"
+      },
+      "field": {
+        "FieldID": 11,
+        "FieldCode": " DOCVARIABLE \"!udSchFilAssist;;1;select assistant to whom queries to be directed;USRFULLNAME\"  ",
+        "FieldResult": " "
+      },
+      "instance_count": 1
+    },
+    {
+      "document": {
+        "DocumentID": 3,
+        "Filename": "sup074.dot"
+      },
+      "field": {
+        "FieldID": 12,
+        "FieldCode": " DOCVARIABLE \"!udSchFilAssist;;1;select assistant to whom queries to be directed;USRDDI\"  ",
+        "FieldResult": " "
+      },
+      "instance_count": 1
+    },
+    {
+      "document": {
+        "DocumentID": 4,
+        "Filename": "sup077b.dot"
+      },
+      "field": {
+        "FieldID": 11,
+        "FieldCode": " DOCVARIABLE \"!udSchFilAssist;;1;select assistant to whom queries to be directed;USRFULLNAME\"  ",
+        "FieldResult": " "
+      },
+      "instance_count": 1
+    },
+    {
+      "document": {
+        "DocumentID": 4,
+        "Filename": "sup077b.dot"
+      },
+      "field": {
+        "FieldID": 12,
+        "FieldCode": " DOCVARIABLE \"!udSchFilAssist;;1;select assistant to whom queries to be directed;USRDDI\"  ",
+        "FieldResult": " "
+      },
+      "instance_count": 1
+    },
+    {
+      "document": {
+        "DocumentID": 4,
+        "Filename": "sup077b.dot"
+      },
+      "field": {
+        "FieldID": 13,
+        "FieldCode": " IF \u0013 DOCVARIABLE \"!aa) is this letter for a superannuation death benefit claim file?\"  \u0015 = \"y\" \"Could you also please advise us of the details of any other claims made with respect to the death benefit, including the names of the claimants.\r\r\" \"\" ",
+        "FieldResult": null
+      },
+      "instance_count": 1
+    },
+    {
+      "document": {
+        "DocumentID": 4,
+        "Filename": "sup077b.dot"
+      },
+      "field": {
+        "FieldID": 14,
+        "FieldCode": " DOCVARIABLE \"!aa) is this letter for a superannuation death benefit claim file?\"  ",
+        "FieldResult": " "
+      },
+      "instance_count": 6
+    },
+    {
+      "document": {
+        "DocumentID": 4,
+        "Filename": "sup077b.dot"
+      },
+      "field": {
+        "FieldID": 15,
+        "FieldCode": " IF \u0013 DOCVARIABLE \"!aa) is this letter for a superannuation death benefit claim file?\"  \u0015 = \"y\" \"Confirmation of the name(s) and address(es) of the Trustee(s) of the Superannuation Fund throughout the period between \u0013 DOCVARIABLE \"!ab) provide date of termination\"  \u0015 and the present date;\r\r2.\tConfirmation of the correct corporate identity of the insurer with respect to our client's death claim;\" \"Confirmation of the correct corporate identity of the insurer with respect to our client's death claim;\" ",
+        "FieldResult": "Confirmation of the correct corporate identity of the insurer with respect to our client's death claim;"
+      },
+      "instance_count": 1
+    },
+    {
+      "document": {
+        "DocumentID": 4,
+        "Filename": "sup077b.dot"
+      },
+      "field": {
+        "FieldID": 16,
+        "FieldCode": " DOCVARIABLE \"!ab) provide date of termination\"  ",
+        "FieldResult": " "
+      },
+      "instance_count": 2
+    },
+    {
+      "document": {
+        "DocumentID": 4,
+        "Filename": "sup077b.dot"
+      },
+      "field": {
+        "FieldID": 17,
+        "FieldCode": " IF \u0013 DOCVARIABLE \"!aa) is this letter for a superannuation death benefit claim file?\"  \u0015 = \"y\" \"3.\t\" \"2.\t\" ",
+        "FieldResult": "2.\t"
+      },
+      "instance_count": 1
+    },
+    {
+      "document": {
+        "DocumentID": 4,
+        "Filename": "sup077b.dot"
+      },
+      "field": {
+        "FieldID": 18,
+        "FieldCode": " IF \u0013 DOCVARIABLE \"!aa) is this letter for a superannuation death benefit claim file?\"  \u0015 = \"y\" \"4.\t\" \"3.\t\" ",
+        "FieldResult": "3.\t"
+      },
+      "instance_count": 1
+    },
+    {
+      "document": {
+        "DocumentID": 4,
+        "Filename": "sup077b.dot"
+      },
+      "field": {
+        "FieldID": 19,
+        "FieldCode": " IF \u0013 DOCVARIABLE \"!aa) is this letter for a superannuation death benefit claim file?\"  \u0015 = \"y\" \"\r\r5.\tA copy of the original Trust Deed as at \u0013 DOCVARIABLE \"!ab) provide date of termination\"  \u0015 and any amendments to the Trust Deed up until this date.\u0013 IF \u0013 DOCVARIABLE \"!ac) is para requesting copy of client's original claim form, medical reports etc to be included?\"  \u0015 = \"y\" \"\r\r6.\tA copy of our client's original completed claim form, medical reports and all other documents provided to or obtained by the Trustees and/or their insurers.\" \"\" \u0015\" \"\u0013 IF \u0013 DOCVARIABLE \"!ac) is para requesting copy of client's original claim form, medical reports etc to be included?\"  \u0015 = \"y\" \"\r\r4.\tA copy of our client's original completed claim form, medical reports and all other documents provided to or obtained by the Insurer.\" \"\" \u0015\" ",
+        "FieldResult": null
+      },
+      "instance_count": 1
+    },
+    {
+      "document": {
+        "DocumentID": 4,
+        "Filename": "sup077b.dot"
+      },
+      "field": {
+        "FieldID": 20,
+        "FieldCode": " IF \u0013 DOCVARIABLE \"!ac) is para requesting copy of client's original claim form, medical reports etc to be included?\"  \u0015 = \"y\" \"\r\r6.\tA copy of our client's original completed claim form, medical reports and all other documents provided to or obtained by the Trustees and/or their insurers.\" \"\" ",
+        "FieldResult": null
+      },
+      "instance_count": 1
+    },
+    {
+      "document": {
+        "DocumentID": 4,
+        "Filename": "sup077b.dot"
+      },
+      "field": {
+        "FieldID": 21,
+        "FieldCode": " DOCVARIABLE \"!ac) is para requesting copy of client's original claim form, medical reports etc to be included?\"  ",
+        "FieldResult": " "
+      },
+      "instance_count": 2
+    },
+    {
+      "document": {
+        "DocumentID": 4,
+        "Filename": "sup077b.dot"
+      },
+      "field": {
+        "FieldID": 22,
+        "FieldCode": " IF \u0013 DOCVARIABLE \"!ac) is para requesting copy of client's original claim form, medical reports etc to be included?\"  \u0015 = \"y\" \"\r\r4.\tA copy of our client's original completed claim form, medical reports and all other documents provided to or obtained by the Insurer.\" \"\" ",
+        "FieldResult": null
+      },
+      "instance_count": 1
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "name": "estimatedoc-dashboard",
+  "version": "1.0.0",
+  "description": "EstimateDoc Analytics Dashboard",
+  "private": true,
+  "scripts": {
+    "dev": "npm run server",
+    "server": "cd server && npm run dev",
+    "build": "cd server && npm run build",
+    "install-all": "npm install && cd server && npm install",
+    "deprecated-client": "echo 'ERROR: Frontend has been archived. See archived-frontends/ directory.'",
+    "deprecated-client-build": "echo 'ERROR: Frontend has been archived. No builds available.'"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

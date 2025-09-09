@@ -1,0 +1,144 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Production builds
+dist/
+dist-ssr/
+build/
+out/
+*.local
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env*.local
+
+# IDE and Editor directories
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+.idea/
+*.swp
+*.swo
+*~
+
+# Testing
+coverage/
+*.lcov
+.nyc_output/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+*.egg-info/
+.eggs/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+*.sql.backup
+*.dump
+
+# Ensure node_modules anywhere are ignored
+estimatedoc-dashboard/**/node_modules/
+
+# Logs
+logs/
+*.log
+log/
+
+# Data directories (large/sensitive)
+ImportantData/
+AlterspectiveAssets/
+database_export/
+
+# Generated reports
+*.xlsx
+*.csv
+
+# Temporary files
+*.tmp
+*.temp
+.tmp/
+.temp/
+tmp/
+temp/
+
+# Cache
+.eslintcache
+.stylelintcache
+*.tsbuildinfo
+.cache/
+.parcel-cache/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# Package manager locks (uncomment if you want to ignore)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+
+# Misc
+*.pem
+*.key
+*.cert
+.history/
+.vscode-test/
+*.vsix
+
+# Backup files
+*.backup
+*.bak
+*.old
+
+# Generated documentation
+docs/_build/
+docs/.doctrees/
+
+# React/Next.js specific
+.next/
+.nuxt/
+.vuepress/dist/
+.serverless/
+.fusebox/
+.dynamodb/
+.tern-port
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# ARCHIVED FRONTENDS - DO NOT COMPILE OR INCLUDE
+archived-frontends/
+# Specifically ignore all archived frontend code
+archived-frontends/react-client-app/
+archived-frontends/legacy-html-ui/
