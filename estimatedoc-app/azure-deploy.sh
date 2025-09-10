@@ -125,9 +125,9 @@ ACR_USERNAME=$(az acr credential show --name $REGISTRY_NAME --query username -o 
 ACR_PASSWORD=$(az acr credential show --name $REGISTRY_NAME --query passwords[0].value -o tsv)
 ACR_LOGIN_SERVER=$(az acr show --name $REGISTRY_NAME --query loginServer -o tsv)
 
-# Build and push Docker image
-echo "🏗️  Building Docker image..."
-docker build -t $IMAGE_NAME:$IMAGE_TAG .
+# Build and push Docker image for AMD64 architecture (required by Azure)
+echo "🏗️  Building Docker image for AMD64 architecture..."
+docker buildx build --platform linux/amd64 -t $IMAGE_NAME:$IMAGE_TAG .
 
 echo "🏷️  Tagging image for ACR..."
 docker tag $IMAGE_NAME:$IMAGE_TAG $ACR_LOGIN_SERVER/$IMAGE_NAME:$IMAGE_TAG
