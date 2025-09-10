@@ -3,18 +3,67 @@
 # Azure deployment script for EstimateDoc Application
 # This script deploys the app to Azure Container Apps with custom domain support
 
-# Configuration
-RESOURCE_GROUP="Alterspective Consulting Services"
-LOCATION="eastus"
-CONTAINER_ENV_NAME="estimatedoc-container-env"
-CONTAINER_APP_NAME="estimatedoc-app"
-REGISTRY_NAME="alterspectiveacr"
-IMAGE_NAME="estimatedoc"
-IMAGE_TAG="latest"
-CUSTOM_DOMAIN="template-discoveryandestimate-mb.alterspective.com.au"
+# Load configuration from .env file
+if [ -f .env ]; then
+    echo "📋 Loading configuration from .env file..."
+    export $(cat .env | grep -v '^#' | xargs)
+else
+    echo "⚠️  No .env file found. Creating from .env.example..."
+    if [ -f .env.example ]; then
+        cp .env.example .env
+        echo "📝 Created .env file from template."
+        echo "❗ Please edit .env with your Azure configuration and run again."
+        exit 1
+    else
+        echo "❌ No .env or .env.example file found."
+        echo "Please create a .env file with your configuration."
+        exit 1
+    fi
+fi
+
+# Validate required environment variables
+REQUIRED_VARS=(
+    "AZURE_RESOURCE_GROUP"
+    "AZURE_LOCATION"
+    "CONTAINER_ENV_NAME"
+    "CONTAINER_APP_NAME"
+    "REGISTRY_NAME"
+    "IMAGE_NAME"
+    "CUSTOM_DOMAIN"
+)
+
+MISSING_VARS=()
+for VAR in "${REQUIRED_VARS[@]}"; do
+    if [ -z "${!VAR}" ]; then
+        MISSING_VARS+=($VAR)
+    fi
+done
+
+if [ ${#MISSING_VARS[@]} -ne 0 ]; then
+    echo "❌ Missing required environment variables in .env:"
+    for VAR in "${MISSING_VARS[@]}"; do
+        echo "   - $VAR"
+    done
+    echo ""
+    echo "Please update your .env file with all required values."
+    exit 1
+fi
+
+# Set configuration from environment variables
+RESOURCE_GROUP="$AZURE_RESOURCE_GROUP"
+LOCATION="$AZURE_LOCATION"
+IMAGE_TAG="${IMAGE_TAG:-latest}"
+CONTAINER_CPU="${CONTAINER_CPU:-0.5}"
+CONTAINER_MEMORY="${CONTAINER_MEMORY:-1.0}"
+MIN_REPLICAS="${MIN_REPLICAS:-1}"
+MAX_REPLICAS="${MAX_REPLICAS:-3}"
 
 echo "🚀 Starting Azure Container Apps deployment for EstimateDoc..."
-echo "📍 Target domain: $CUSTOM_DOMAIN"
+echo "📋 Configuration loaded from .env:"
+echo "   Resource Group: $RESOURCE_GROUP"
+echo "   Location: $LOCATION"
+echo "   Container App: $CONTAINER_APP_NAME"
+echo "   Custom Domain: $CUSTOM_DOMAIN"
 echo ""
 
 # Check if logged in to Azure
@@ -131,10 +180,10 @@ if [ $? -ne 0 ]; then
         --registry-server $ACR_LOGIN_SERVER \
         --registry-username $ACR_USERNAME \
         --registry-password $ACR_PASSWORD \
-        --cpu 0.5 \
-        --memory 1.0 \
-        --min-replicas 1 \
-        --max-replicas 3
+        --cpu $CONTAINER_CPU \
+        --memory $CONTAINER_MEMORY \
+        --min-replicas $MIN_REPLICAS \
+        --max-replicas $MAX_REPLICAS
 else
     echo "🔄 Updating existing Container App..."
     az containerapp update \
