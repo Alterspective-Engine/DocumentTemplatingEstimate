@@ -1,5 +1,6 @@
-import React from 'react';
-import { X, Database, FileText, Copy, ExternalLink } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, Database, FileText, Copy, ExternalLink, Play, Loader } from 'lucide-react';
+import { executeQuery, formatQueryResults } from '../../services/queryService';
 import './EvidenceModal.css';
 
 interface EvidenceModalProps {
@@ -8,9 +9,30 @@ interface EvidenceModalProps {
 }
 
 export const EvidenceModal: React.FC<EvidenceModalProps> = ({ evidence, onClose }) => {
+  const [queryResult, setQueryResult] = useState<string | null>(null);
+  const [isExecuting, setIsExecuting] = useState(false);
+  const [showResult, setShowResult] = useState(false);
+
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     // In a real app, show a toast notification
+  };
+
+  const runQuery = async () => {
+    if (!evidence.query) return;
+    
+    setIsExecuting(true);
+    setShowResult(true);
+    
+    try {
+      const result = await executeQuery(evidence.query);
+      const formatted = formatQueryResults(result);
+      setQueryResult(`Execution time: ${result.executionTime?.toFixed(2)}ms\n\n${formatted}`);
+    } catch (error) {
+      setQueryResult(`Error executing query: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setIsExecuting(false);
+    }
   };
 
   return (
@@ -55,15 +77,47 @@ export const EvidenceModal: React.FC<EvidenceModalProps> = ({ evidence, onClose 
                 <div className="query-section">
                   <div className="query-header">
                     <span className="label">Query:</span>
-                    <button 
-                      className="copy-button"
-                      onClick={() => copyToClipboard(evidence.query)}
-                      aria-label="Copy query"
-                    >
-                      <Copy size={14} />
-                    </button>
+                    <div className="query-actions">
+                      <button 
+                        className="action-button run-button"
+                        onClick={runQuery}
+                        disabled={isExecuting}
+                        aria-label="Run query"
+                      >
+                        {isExecuting ? <Loader size={14} className="spinning" /> : <Play size={14} />}
+                        <span>Run</span>
+                      </button>
+                      <button 
+                        className="action-button copy-button"
+                        onClick={() => copyToClipboard(evidence.query)}
+                        aria-label="Copy query"
+                      >
+                        <Copy size={14} />
+                        <span>Copy</span>
+                      </button>
+                    </div>
                   </div>
                   <pre className="query-code">{evidence.query}</pre>
+                  
+                  {showResult && (
+                    <div className="query-result">
+                      <div className="result-header">
+                        <span className="label">Query Result:</span>
+                        {queryResult && !isExecuting && (
+                          <button 
+                            className="action-button"
+                            onClick={() => setShowResult(false)}
+                            aria-label="Close result"
+                          >
+                            <X size={14} />
+                          </button>
+                        )}
+                      </div>
+                      <pre className="result-content">
+                        {isExecuting ? 'Executing query...' : queryResult || 'No result'}
+                      </pre>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
