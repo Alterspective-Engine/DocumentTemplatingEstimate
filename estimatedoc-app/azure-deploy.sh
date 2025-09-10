@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Azure deployment script for EstimateDoc Application
-# This script deploys the app to Azure Container Apps
+# This script deploys the app to Azure Container Apps with custom domain support
 
 # Configuration
 RESOURCE_GROUP="Alterspective Consulting Services"
@@ -11,8 +11,11 @@ CONTAINER_APP_NAME="estimatedoc-app"
 REGISTRY_NAME="alterspectiveacr"
 IMAGE_NAME="estimatedoc"
 IMAGE_TAG="latest"
+CUSTOM_DOMAIN="template-discoveryandestimate-mb.alterspective.com.au"
 
 echo "🚀 Starting Azure Container Apps deployment for EstimateDoc..."
+echo "📍 Target domain: $CUSTOM_DOMAIN"
+echo ""
 
 # Check if logged in to Azure
 echo "📝 Checking Azure login status..."
@@ -25,18 +28,20 @@ fi
 # Set the subscription (optional - remove if using default)
 # az account set --subscription "YOUR_SUBSCRIPTION_ID"
 
-# Check if resource group exists
-echo "🔍 Checking resource group..."
+# Create or verify resource group
+echo "🔍 Checking resource group '$RESOURCE_GROUP'..."
 az group show --name "$RESOURCE_GROUP" > /dev/null 2>&1
 if [ $? -ne 0 ]; then
-    echo "❌ Resource group '$RESOURCE_GROUP' not found."
-    echo "Would you like to create it? (y/n)"
-    read -r response
-    if [[ "$response" == "y" ]]; then
-        echo "📦 Creating resource group..."
-        az group create --name "$RESOURCE_GROUP" --location "$LOCATION"
+    echo "📦 Creating new resource group '$RESOURCE_GROUP' in $LOCATION..."
+    az group create \
+        --name "$RESOURCE_GROUP" \
+        --location "$LOCATION" \
+        --tags "Application=EstimateDoc" "Environment=Production" "ManagedBy=AlterspectiveConsulting"
+    
+    if [ $? -eq 0 ]; then
+        echo "✅ Resource group created successfully"
     else
-        echo "❌ Cannot proceed without resource group. Exiting."
+        echo "❌ Failed to create resource group. Exiting."
         exit 1
     fi
 else
@@ -128,14 +133,66 @@ APP_URL=$(az containerapp show \
     --query properties.configuration.ingress.fqdn \
     -o tsv)
 
+# Configure custom domain
 echo ""
+echo "🌐 Configuring custom domain: $CUSTOM_DOMAIN"
+echo ""
+
+# Add custom domain to Container App
+echo "📝 Adding custom domain to Container App..."
+az containerapp hostname add \
+    --name $CONTAINER_APP_NAME \
+    --resource-group "$RESOURCE_GROUP" \
+    --hostname $CUSTOM_DOMAIN \
+    --output none 2>/dev/null
+
+# Get the verification details
+echo "🔍 Getting DNS configuration requirements..."
+VERIFICATION_ID=$(az containerapp hostname list \
+    --name $CONTAINER_APP_NAME \
+    --resource-group "$RESOURCE_GROUP" \
+    --query "[?name=='$CUSTOM_DOMAIN'].validationToken" \
+    -o tsv 2>/dev/null)
+
+echo ""
+echo "=================================================================================="
 echo "✅ Deployment complete!"
-echo "🌐 Application URL: https://$APP_URL"
+echo "=================================================================================="
+echo ""
+echo "🌐 Application URLs:"
+echo "   Default Azure URL: https://$APP_URL"
+echo "   Custom Domain: https://$CUSTOM_DOMAIN (after DNS configuration)"
 echo ""
 echo "📊 EstimateDoc Application Details:"
 echo "   - Resource Group: $RESOURCE_GROUP"
 echo "   - Container Environment: $CONTAINER_ENV_NAME"
 echo "   - Container App: $CONTAINER_APP_NAME"
 echo "   - Container Registry: $REGISTRY_NAME"
+echo "   - Custom Domain: $CUSTOM_DOMAIN"
 echo ""
+echo "=================================================================================="
+echo "📌 IMPORTANT: DNS Configuration Required"
+echo "=================================================================================="
+echo ""
+echo "To activate your custom domain, add these DNS records at your domain provider:"
+echo ""
+echo "1️⃣  CNAME Record:"
+echo "   Host: template-discoveryandestimate-mb"
+echo "   Points to: $APP_URL"
+echo "   TTL: 3600 (or your preference)"
+echo ""
+if [ ! -z "$VERIFICATION_ID" ]; then
+    echo "2️⃣  TXT Record (for domain verification):"
+    echo "   Host: asuid.template-discoveryandestimate-mb"
+    echo "   Value: $VERIFICATION_ID"
+    echo "   TTL: 3600"
+    echo ""
+fi
+echo "3️⃣  After adding DNS records:"
+echo "   - DNS propagation typically takes 15-60 minutes"
+echo "   - SSL certificate will be automatically provisioned"
+echo "   - Your app will be accessible at: https://$CUSTOM_DOMAIN"
+echo ""
+echo "=================================================================================="
 echo "🎉 Your EstimateDoc app is now live on Azure Container Apps!"
+echo "=================================================================================="
