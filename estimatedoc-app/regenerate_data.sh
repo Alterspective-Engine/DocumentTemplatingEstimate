@@ -173,7 +173,20 @@ if [ "$GENERATE_TS" = true ]; then
     echo ""
     echo "📝 Generating TypeScript data file..."
     
-    if [ -f "generate_documents_data.py" ]; then
+    # Use the new database-based generator
+    if [ -f "generate_documents_from_db.py" ]; then
+        if [ "$COMPLETE_EXTRACTION" = true ]; then
+            python3 generate_documents_from_db.py --complete
+        else
+            python3 generate_documents_from_db.py
+        fi
+        if [ $? -eq 0 ]; then
+            echo -e "${GREEN}✅ TypeScript file generated from database${NC}"
+        else
+            echo -e "${YELLOW}⚠️  TypeScript generation failed${NC}"
+        fi
+    elif [ -f "generate_documents_data.py" ]; then
+        # Fallback to old generator if new one not found
         python3 generate_documents_data.py
         if [ $? -eq 0 ]; then
             echo -e "${GREEN}✅ TypeScript file generated${NC}"
