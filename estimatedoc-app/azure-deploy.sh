@@ -49,7 +49,7 @@ else
 fi
 
 # Create Azure Container Registry if it doesn't exist
-echo "🔍 Checking Azure Container Registry..."
+echo "🔍 Checking Azure Container Registry '$REGISTRY_NAME'..."
 az acr show --name $REGISTRY_NAME --resource-group "$RESOURCE_GROUP" > /dev/null 2>&1
 if [ $? -ne 0 ]; then
     echo "📦 Creating Azure Container Registry..."
@@ -57,7 +57,15 @@ if [ $? -ne 0 ]; then
         --resource-group "$RESOURCE_GROUP" \
         --name $REGISTRY_NAME \
         --sku Basic \
-        --admin-enabled true
+        --admin-enabled true \
+        --tags "Application=EstimateDoc" "Environment=Production"
+    
+    if [ $? -eq 0 ]; then
+        echo "✅ Container Registry created successfully"
+    else
+        echo "❌ Failed to create Container Registry. Exiting."
+        exit 1
+    fi
 else
     echo "✅ Container Registry exists"
 fi
@@ -82,7 +90,7 @@ echo "📤 Pushing image to ACR..."
 docker push $ACR_LOGIN_SERVER/$IMAGE_NAME:$IMAGE_TAG
 
 # Create Container Apps environment if it doesn't exist
-echo "🔍 Checking Container Apps environment..."
+echo "🔍 Checking Container Apps environment '$CONTAINER_ENV_NAME'..."
 az containerapp env show \
     --name $CONTAINER_ENV_NAME \
     --resource-group "$RESOURCE_GROUP" > /dev/null 2>&1
@@ -91,7 +99,17 @@ if [ $? -ne 0 ]; then
     az containerapp env create \
         --name $CONTAINER_ENV_NAME \
         --resource-group "$RESOURCE_GROUP" \
-        --location "$LOCATION"
+        --location "$LOCATION" \
+        --tags "Application=EstimateDoc" "Environment=Production"
+    
+    if [ $? -eq 0 ]; then
+        echo "✅ Container Apps environment created successfully"
+        echo "⏳ Waiting for environment to be ready..."
+        sleep 10
+    else
+        echo "❌ Failed to create Container Apps environment. Exiting."
+        exit 1
+    fi
 else
     echo "✅ Container Apps environment exists"
 fi
@@ -136,18 +154,49 @@ APP_URL=$(az containerapp show \
 # Configure custom domain
 echo ""
 echo "🌐 Configuring custom domain: $CUSTOM_DOMAIN"
-echo ""
 
-# Add custom domain to Container App
-echo "📝 Adding custom domain to Container App..."
-az containerapp hostname add \
+# Check if custom domain already exists
+echo "🔍 Checking if custom domain is already configured..."
+EXISTING_DOMAIN=$(az containerapp hostname list \
     --name $CONTAINER_APP_NAME \
     --resource-group "$RESOURCE_GROUP" \
-    --hostname $CUSTOM_DOMAIN \
-    --output none 2>/dev/null
+    --query "[?name=='$CUSTOM_DOMAIN'].name" \
+    -o tsv 2>/dev/null)
 
-# Get the verification details
-echo "🔍 Getting DNS configuration requirements..."
+if [ "$EXISTING_DOMAIN" == "$CUSTOM_DOMAIN" ]; then
+    echo "✅ Custom domain is already configured"
+    
+    # Check validation status
+    VALIDATION_STATUS=$(az containerapp hostname list \
+        --name $CONTAINER_APP_NAME \
+        --resource-group "$RESOURCE_GROUP" \
+        --query "[?name=='$CUSTOM_DOMAIN'].validationStatus" \
+        -o tsv 2>/dev/null)
+    
+    echo "   Validation status: $VALIDATION_STATUS"
+    
+    if [ "$VALIDATION_STATUS" != "Succeeded" ]; then
+        echo "⚠️  Domain validation pending - DNS configuration may be required"
+    fi
+else
+    echo "📝 Adding custom domain to Container App..."
+    
+    # Add the custom domain
+    az containerapp hostname add \
+        --name $CONTAINER_APP_NAME \
+        --resource-group "$RESOURCE_GROUP" \
+        --hostname $CUSTOM_DOMAIN \
+        --output none
+    
+    if [ $? -eq 0 ]; then
+        echo "✅ Custom domain added successfully"
+    else
+        echo "⚠️  Could not add custom domain - it may require manual configuration"
+    fi
+fi
+
+# Get the verification details (always show for reference)
+echo "🔍 Getting DNS configuration details..."
 VERIFICATION_ID=$(az containerapp hostname list \
     --name $CONTAINER_APP_NAME \
     --resource-group "$RESOURCE_GROUP" \
