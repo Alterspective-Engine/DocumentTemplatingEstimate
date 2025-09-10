@@ -189,7 +189,7 @@ export const DocumentDetail: React.FC<DocumentDetailProps> = ({ document, onClos
                       {document.evidence.source || 'SQL Database'}
                     </p>
                     <p className="body-small">
-                      Query: {document.evidence.query || 'The336_Field_Analysis_Enhanced.xlsx'}
+                      Query: {document.evidence.query || 'SELECT * FROM documents'}
                     </p>
                     <p className="body-small">
                       Confidence: {document.evidence.confidence || 95}%

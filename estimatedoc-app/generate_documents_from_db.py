@@ -70,7 +70,10 @@ export const documentsData: Document[] = [
                 "Field Analysis Data"
             ]
         
-        # Build the document object
+        # Calculate total fields for reusable calculations
+        total_fields = doc['total_all_fields']
+        
+        # Build the document object with proper type structure
         doc_obj = f"""  {{
     id: {doc['id']},
     name: "{doc['name'].replace('"', '\\"')}",
@@ -78,107 +81,141 @@ export const documentsData: Document[] = [
     sqlFilename: "{doc['sql_filename'] if doc['sql_filename'] else f"{doc['id']}.dot"}",
     fields: {{
       if: {{
-        total: {doc['if_count']},
-        unique: {doc['if_count']},  
+        count: {doc['if_count']},
+        unique: {doc['if_count']},
         reusable: 0,
-        reuseRatio: "0.0%",
-        fields: {{
+        reuseRate: "0%",
+        evidence: {{
           source: "Database Extraction",
-          count: {doc['if_count']}
+          traceId: "trace-if-{doc['id']}"
         }}
       }},
       precedentScript: {{
-        total: {doc['precedent_script_count']},
+        count: {doc['precedent_script_count']},
         unique: {doc['precedent_script_count']},
         reusable: 0,
-        reuseRatio: "0.0%",
-        fields: {{
+        reuseRate: "0%",
+        evidence: {{
           source: "Database Extraction",
-          count: {doc['precedent_script_count']}
+          traceId: "trace-ps-{doc['id']}"
         }}
       }},
       reflection: {{
-        total: {doc['reflection_count']},
+        count: {doc['reflection_count']},
         unique: {doc['reflection_count']},
         reusable: 0,
-        reuseRatio: "0.0%",
-        fields: {{
+        reuseRate: "0%",
+        evidence: {{
           source: "Database Extraction",
-          count: {doc['reflection_count']}
+          traceId: "trace-ref-{doc['id']}"
         }}
       }},
       search: {{
-        total: {doc['search_count']},
+        count: {doc['search_count']},
         unique: {doc['search_count']},
         reusable: 0,
-        reuseRatio: "0.0%",
-        fields: {{
+        reuseRate: "0%",
+        evidence: {{
           source: "Database Extraction",
-          count: {doc['search_count']}
+          traceId: "trace-search-{doc['id']}"
         }}
       }},
       unbound: {{
-        total: {doc['unbound_count']},
+        count: {doc['unbound_count']},
         unique: {doc['unbound_count']},
         reusable: 0,
-        reuseRatio: "0.0%",
-        fields: {{
+        reuseRate: "0%",
+        evidence: {{
           source: "Database Extraction",
-          count: {doc['unbound_count']}
+          traceId: "trace-unbound-{doc['id']}"
         }}
       }},
       builtInScript: {{
-        total: {doc['built_in_script_count']},
+        count: {doc['built_in_script_count']},
         unique: {doc['built_in_script_count']},
         reusable: 0,
-        reuseRatio: "0.0%",
-        fields: {{
+        reuseRate: "0%",
+        evidence: {{
           source: "Database Extraction",
-          count: {doc['built_in_script_count']}
+          traceId: "trace-bis-{doc['id']}"
         }}
       }},
       extended: {{
-        total: {doc['extended_count']},
+        count: {doc['extended_count']},
         unique: {doc['extended_count']},
         reusable: 0,
-        reuseRatio: "0.0%",
-        fields: {{
+        reuseRate: "0%",
+        evidence: {{
           source: "Database Extraction",
-          count: {doc['extended_count']}
+          traceId: "trace-ext-{doc['id']}"
         }}
       }},
       scripted: {{
-        total: {doc['scripted_count']},
+        count: {doc['scripted_count']},
         unique: {doc['scripted_count']},
         reusable: 0,
-        reuseRatio: "0.0%",
-        fields: {{
+        reuseRate: "0%",
+        evidence: {{
           source: "Database Extraction",
-          count: {doc['scripted_count']}
+          traceId: "trace-script-{doc['id']}"
         }}
       }}
     }},
-    totalAllFields: {doc['total_all_fields']},
-    complexityLevel: "{doc['complexity_level']}",
-    excelComplexityVLookup: "{doc['complexity_level']}",
+    totals: {{
+      allFields: {total_fields},
+      uniqueFields: {total_fields},
+      reusableFields: 0,
+      reuseRate: "0%"
+    }},
+    complexity: {{
+      level: "{doc['complexity_level']}",
+      reason: "Based on field count and type distribution",
+      calculation: {{
+        formula: "complexity = f(field_count, field_types)",
+        inputs: {{
+          "total_fields": {total_fields},
+          "if_fields": {doc['if_count']},
+          "script_fields": {doc['precedent_script_count'] + doc['scripted_count'] + doc['built_in_script_count']}
+        }},
+        steps: [
+          {{ label: "Count total fields", value: {total_fields} }},
+          {{ label: "Classify complexity", value: "{doc['complexity_level']}" }}
+        ],
+        result: {1 if doc['complexity_level'] == 'Simple' else 2 if doc['complexity_level'] == 'Moderate' else 3}
+      }}
+    }},
     effort: {{
       calculated: {doc['effort_calculated']:.2f},
       optimized: {doc['effort_optimized']:.2f},
-      savings: {doc['effort_savings']:.2f}
+      savings: {doc['effort_savings']:.2f},
+      calculation: {{
+        formula: "effort = (if_fields * 7 + script_fields * 15 + tag_fields * 1) / 60 * complexity_multiplier",
+        inputs: {{
+          "if_fields": {doc['if_count']},
+          "script_fields": {doc['precedent_script_count'] + doc['scripted_count'] + doc['built_in_script_count']},
+          "tag_fields": {doc['reflection_count'] + doc['extended_count'] + doc['unbound_count'] + doc['search_count']}
+        }},
+        steps: [
+          {{ label: "Calculate base minutes", value: {(doc['if_count'] * 7 + (doc['precedent_script_count'] + doc['scripted_count'] + doc['built_in_script_count']) * 15 + (doc['reflection_count'] + doc['extended_count'] + doc['unbound_count'] + doc['search_count']) * 1)} }},
+          {{ label: "Convert to hours", value: {doc['effort_calculated']:.2f} }},
+          {{ label: "Apply optimization", value: {doc['effort_optimized']:.2f} }}
+        ],
+        result: {doc['effort_optimized']:.2f}
+      }}
     }},
     evidence: {{
       source: "Multi-Source Database Extraction",
-      dataSources: {json.dumps(evidence_sources)},
-      extractionMethod: "{match_strategy}",
-      query: `SELECT * FROM {table_name} WHERE id = {doc['id']}
--- Data extracted from: {', '.join(evidence_sources)}
--- Mapping Strategy: {match_strategy}
--- SQL Doc ID: {doc['sql_doc_id'] if doc['sql_doc_id'] else 'N/A'}`,
-      traceId: "trace-{doc['id']}-{match_strategy.lower().replace(' ', '-')}",
-      lastUpdated: "{doc['analysis_date'] if doc['analysis_date'] else datetime.now().date().isoformat()}"{',' if doc['sql_doc_id'] else ''}
-      {f"sqlDocId: {doc['sql_doc_id']}," if doc['sql_doc_id'] else ''}
-      {f"manifestCode: \"{doc['manifest_code']}\"," if 'manifest_code' in doc.keys() and doc['manifest_code'] else ''}
-      confidence: {doc['confidence_score'] if 'confidence_score' in doc.keys() and doc['confidence_score'] else 1.0}
+      details: "Data extracted from: {', '.join(evidence_sources)}",
+      query: `SELECT * FROM {table_name} WHERE id = {doc['id']}`,
+      confidence: {doc['confidence_score'] if 'confidence_score' in doc.keys() and doc['confidence_score'] else 1.0},
+      files: {json.dumps(evidence_sources)},
+      lastUpdated: new Date("{doc['analysis_date'] if doc['analysis_date'] else datetime.now().date().isoformat()}"),
+      traceability: {{
+        dataSource: "{', '.join(evidence_sources)}",
+        analysisDate: "{doc['analysis_date'] if doc['analysis_date'] else datetime.now().date().isoformat()}",
+        documentId: {doc['id']},
+        mappingMethod: "{match_strategy}"
+      }}
     }}
   }},"""
         
