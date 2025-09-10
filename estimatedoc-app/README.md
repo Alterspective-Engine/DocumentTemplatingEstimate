@@ -22,10 +22,13 @@ npm run dev
 - **No Fabrication**: Only displays existing data from source files
 
 ### Document Management
-- View all 547 documents with complexity and effort metrics
+- View all 547 documents from ClientRequirements.xlsx
+  - 336 documents (61.4%) with complete field analysis
+  - 211 documents (38.6%) included for inventory completeness
 - Filter by complexity level and data source
 - Search by name or description
 - Sort by multiple criteria
+- See [DATA_SUMMARY.md](DATA_SUMMARY.md) for detailed data breakdown
 
 ### Detailed Analysis
 - Field breakdown across 8 categories
