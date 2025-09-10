@@ -43,20 +43,44 @@ def generate_from_database(db_path='src/database/estimatedoc.db', output_type='b
 export const documentsData: Document[] = [
 """
     
-    for doc in documents:
+    for row in documents:
+        # Convert Row to dict for easier access
+        doc = dict(row)
+        
         # Build evidence based on actual data sources
         evidence_sources = []
         
-        # Determine data sources based on fields
-        if doc['evidence_source'] == 'SQL' or doc['sql_doc_id']:
-            evidence_sources.append("SQL Server Database (Mosmar_CIP_Dev)")
-        
-        if 'manifest_code' in doc.keys() and doc['manifest_code']:
-            evidence_sources.append("ExportSandI.Manifest.xml")
-        
-        match_strategy = doc['match_strategy'] if 'match_strategy' in doc.keys() else 'Direct'
-        if match_strategy in ['PrecPath', 'XML Parse']:
-            evidence_sources.append("Precedent XML Files")
+        # Handle different database schemas
+        if output_type == 'complete':
+            # Complete database uses different column names
+            doc_name = doc['client_name']
+            doc_description = doc['description'] if doc['description'] else 'Legal document template'
+            sql_filename = doc['sql_filename'] if 'sql_filename' in doc.keys() and doc['sql_filename'] else f"{doc['id']}.dot"
+            
+            if doc['sql_doc_id']:
+                evidence_sources.append("SQL Server Database (Mosmar_CIP_Dev)")
+            
+            if 'manifest_code' in doc.keys() and doc['manifest_code']:
+                evidence_sources.append("ExportSandI.Manifest.xml")
+            
+            match_strategy = doc['mapping_strategy'] if 'mapping_strategy' in doc.keys() else 'Direct'
+            if match_strategy in ['PrecPath', 'XML Parse']:
+                evidence_sources.append("Precedent XML Files")
+        else:
+            # Basic database schema
+            doc_name = doc['name']
+            doc_description = doc['description'] if doc['description'] else 'Legal document template'
+            sql_filename = doc['sql_filename'] if doc['sql_filename'] else f"{doc['id']}.dot"
+            
+            if 'evidence_source' in doc.keys() and doc['evidence_source'] == 'SQL' or doc['sql_doc_id']:
+                evidence_sources.append("SQL Server Database (Mosmar_CIP_Dev)")
+            
+            if 'manifest_code' in doc.keys() and doc['manifest_code']:
+                evidence_sources.append("ExportSandI.Manifest.xml")
+            
+            match_strategy = doc['match_strategy'] if 'match_strategy' in doc.keys() else 'Direct'
+            if match_strategy in ['PrecPath', 'XML Parse']:
+                evidence_sources.append("Precedent XML Files")
         
         # Always includes client requirements as the source of client titles
         evidence_sources.append("ClientRequirements.xlsx")
@@ -71,18 +95,18 @@ export const documentsData: Document[] = [
             ]
         
         # Calculate total fields for reusable calculations
-        total_fields = doc['total_all_fields']
+        total_fields = doc['total_fields'] if 'total_fields' in doc.keys() else doc.get('total_all_fields', 0)
         
         # Build the document object with proper type structure
         doc_obj = f"""  {{
     id: {doc['id']},
-    name: "{doc['name'].replace('"', '\\"')}",
-    description: "{doc['description'].replace('"', '\\"') if doc['description'] else 'Legal document template'}",
-    sqlFilename: "{doc['sql_filename'] if doc['sql_filename'] else f"{doc['id']}.dot"}",
+    name: "{doc_name.replace('"', '\\"')}",
+    description: "{doc_description.replace('"', '\\"')}",
+    sqlFilename: "{sql_filename}",
     fields: {{
       if: {{
-        count: {doc['if_count']},
-        unique: {doc['if_count']},
+        count: {doc.get('if_count', 0)},
+        unique: {doc.get('if_count', 0)},
         reusable: 0,
         reuseRate: "0%",
         evidence: {{
@@ -174,8 +198,8 @@ export const documentsData: Document[] = [
         formula: "complexity = f(field_count, field_types)",
         inputs: {{
           "total_fields": {total_fields},
-          "if_fields": {doc['if_count']},
-          "script_fields": {doc['precedent_script_count'] + doc['scripted_count'] + doc['built_in_script_count']}
+          "if_fields": {doc.get('if_count', 0)},
+          "script_fields": {doc.get('precedent_script_count', 0) + doc.get('scripted_count', 0) + doc.get('built_in_script_count', 0)}
         }},
         steps: [
           {{ label: "Count total fields", value: {total_fields} }},
@@ -185,22 +209,22 @@ export const documentsData: Document[] = [
       }}
     }},
     effort: {{
-      calculated: {doc['effort_calculated']:.2f},
-      optimized: {doc['effort_optimized']:.2f},
-      savings: {doc['effort_savings']:.2f},
+      calculated: {doc.get('effort_calculated', doc.get('effort_hours', 0)):.2f},
+      optimized: {doc.get('effort_optimized', doc.get('effort_hours', 0) * 0.8):.2f},
+      savings: {doc.get('effort_savings', doc.get('effort_hours', 0) * 0.2):.2f},
       calculation: {{
         formula: "effort = (if_fields * 7 + script_fields * 15 + tag_fields * 1) / 60 * complexity_multiplier",
         inputs: {{
-          "if_fields": {doc['if_count']},
-          "script_fields": {doc['precedent_script_count'] + doc['scripted_count'] + doc['built_in_script_count']},
-          "tag_fields": {doc['reflection_count'] + doc['extended_count'] + doc['unbound_count'] + doc['search_count']}
+          "if_fields": {doc.get('if_count', 0)},
+          "script_fields": {doc.get('precedent_script_count', 0) + doc.get('scripted_count', 0) + doc.get('built_in_script_count', 0)},
+          "tag_fields": {doc.get('reflection_count', 0) + doc.get('extended_count', 0) + doc.get('unbound_count', 0) + doc.get('search_count', 0)}
         }},
         steps: [
-          {{ label: "Calculate base minutes", value: {(doc['if_count'] * 7 + (doc['precedent_script_count'] + doc['scripted_count'] + doc['built_in_script_count']) * 15 + (doc['reflection_count'] + doc['extended_count'] + doc['unbound_count'] + doc['search_count']) * 1)} }},
-          {{ label: "Convert to hours", value: {doc['effort_calculated']:.2f} }},
-          {{ label: "Apply optimization", value: {doc['effort_optimized']:.2f} }}
+          {{ label: "Calculate base minutes", value: {(doc.get('if_count', 0) * 7 + (doc.get('precedent_script_count', 0) + doc.get('scripted_count', 0) + doc.get('built_in_script_count', 0)) * 15 + (doc.get('reflection_count', 0) + doc.get('extended_count', 0) + doc.get('unbound_count', 0) + doc.get('search_count', 0)) * 1)} }},
+          {{ label: "Convert to hours", value: {doc.get('effort_calculated', doc.get('effort_hours', 0)):.2f} }},
+          {{ label: "Apply optimization", value: {doc.get('effort_optimized', doc.get('effort_hours', 0) * 0.8):.2f} }}
         ],
-        result: {doc['effort_optimized']:.2f}
+        result: {doc.get('effort_optimized', doc.get('effort_hours', 0) * 0.8):.2f}
       }}
     }},
     evidence: {{
