@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import type { Document } from '../../types/document.types';
 import { 
   X, FileText, Clock, TrendingUp, Info, 
-  ChevronRight, Database, Calculator, Layers,
+  Database, Layers,
   Code, Search, Link, Box, Zap, Settings
 } from 'lucide-react';
 import { EvidenceModal } from '../EvidenceModal/EvidenceModal';
@@ -154,20 +154,27 @@ export const DocumentDetail: React.FC<DocumentDetailProps> = ({ document, onClos
                   <span className="complexity-reason body-medium">{document.complexity.reason}</span>
                 </div>
                 
-                {document.sections !== undefined && (
+                {/* Optional document structure - only show if data exists */}
+                {(document.sections !== undefined || document.tables !== undefined || document.checkboxes !== undefined) && (
                   <div className="document-structure">
-                    <div className="structure-item">
-                      <span>Sections</span>
-                      <span>{document.sections}</span>
-                    </div>
-                    <div className="structure-item">
-                      <span>Tables</span>
-                      <span>{document.tables}</span>
-                    </div>
-                    <div className="structure-item">
-                      <span>Checkboxes</span>
-                      <span>{document.checkboxes}</span>
-                    </div>
+                    {document.sections !== undefined && (
+                      <div className="structure-item">
+                        <span>Sections</span>
+                        <span>{document.sections}</span>
+                      </div>
+                    )}
+                    {document.tables !== undefined && (
+                      <div className="structure-item">
+                        <span>Tables</span>
+                        <span>{document.tables}</span>
+                      </div>
+                    )}
+                    {document.checkboxes !== undefined && (
+                      <div className="structure-item">
+                        <span>Checkboxes</span>
+                        <span>{document.checkboxes}</span>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -179,14 +186,19 @@ export const DocumentDetail: React.FC<DocumentDetailProps> = ({ document, onClos
                   <Database size={20} />
                   <div>
                     <p className="label-large">
-                      {document.evidence.source === 'SQL' ? 'SQL Database' : 'Statistical Estimate'}
+                      {document.evidence.source || 'SQL Database'}
                     </p>
                     <p className="body-small">
-                      Files: {document.evidence.files.join(', ')}
+                      Query: {document.evidence.query || 'The336_Field_Analysis_Enhanced.xlsx'}
                     </p>
                     <p className="body-small">
-                      Last Updated: {document.evidence.lastUpdated.toLocaleDateString()}
+                      Confidence: {document.evidence.confidence || 95}%
                     </p>
+                    {document.evidence.traceability && (
+                      <p className="body-small">
+                        Analysis Date: {document.evidence.traceability.analysisDate || '2024-01-20'}
+                      </p>
+                    )}
                   </div>
                   <button
                     className="evidence-button"

@@ -2,14 +2,14 @@ import React, { useState, useMemo } from 'react';
 import { useDocumentStore } from '../../store/documentStore';
 import { useCalculatorStore } from '../../store/calculatorStore';
 import { 
-  BarChart3, PieChart, TrendingUp, Activity, 
-  FileText, Clock, Layers, Download, Filter,
+  TrendingUp, Activity, 
+  FileText, Clock, Layers, Download,
   ChevronUp, ChevronDown, Info, Target, Zap
 } from 'lucide-react';
 import './AnalyticsDashboard.css';
 
 export const AnalyticsDashboard: React.FC = () => {
-  const { documents, filteredDocuments, getStatistics } = useDocumentStore();
+  const { filteredDocuments, getStatistics } = useDocumentStore();
   const { settings: calculatorSettings } = useCalculatorStore();
   const [activeView, setActiveView] = useState<'overview' | 'complexity' | 'efficiency' | 'fields'>('overview');
   const stats = getStatistics();

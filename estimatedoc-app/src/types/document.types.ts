@@ -58,9 +58,18 @@ export interface DocumentEffort {
 }
 
 export interface DocumentEvidence {
-  source: 'SQL' | 'Estimated';
-  files: string[];
-  lastUpdated: Date;
+  source: string; // Allow any string for source mapping strategies
+  details?: string;
+  query?: string;
+  confidence?: number;
+  files?: string[];
+  lastUpdated?: Date;
+  traceability?: {
+    dataSource: string;
+    analysisDate: string;
+    documentId: number;
+    mappingMethod: string;
+  };
 }
 
 export interface Document {
