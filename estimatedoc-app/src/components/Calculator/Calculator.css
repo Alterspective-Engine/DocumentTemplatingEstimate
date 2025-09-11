@@ -115,6 +115,109 @@
   font-family: 'Montserrat', sans-serif;
 }
 
+/* Preview Impact Panel */
+.preview-impact-panel {
+  padding: var(--md-sys-spacing-lg);
+  background: linear-gradient(135deg, 
+    rgba(171, 221, 101, 0.08) 0%, 
+    rgba(7, 81, 86, 0.06) 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  animation: fadeIn var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-emphasized);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.preview-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--md-sys-spacing-xs);
+  margin-bottom: var(--md-sys-spacing-md);
+}
+
+.preview-header h3 {
+  margin: 0;
+  color: var(--alterspective-gray-dark);
+  font-weight: 600;
+}
+
+.preview-header .label-small {
+  color: var(--md-sys-color-on-surface-variant);
+  opacity: 0.8;
+}
+
+.preview-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--md-sys-spacing-sm);
+}
+
+.metric-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--md-sys-spacing-md);
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border-radius: var(--md-sys-shape-corner-medium);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  transition: all var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
+}
+
+.metric-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.metric-label {
+  font-size: var(--md-sys-typescale-label-small-size);
+  color: var(--md-sys-color-on-surface-variant);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: var(--md-sys-spacing-xs);
+}
+
+.metric-value {
+  font-size: var(--md-sys-typescale-headline-small-size);
+  font-weight: 600;
+  color: var(--alterspective-gray-dark);
+}
+
+.metric-value.highlight {
+  color: var(--alterspective-marine);
+  font-weight: 700;
+}
+
+.metric-value.positive {
+  color: var(--alterspective-green);
+}
+
+.metric-value.negative {
+  color: var(--error-color, #dc2626);
+}
+
+@media (max-width: 600px) {
+  .preview-metrics {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 .calculator-content {
   flex: 1;
   overflow-y: auto;

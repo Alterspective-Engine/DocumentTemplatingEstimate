@@ -1,0 +1,241 @@
+{
+  "timestamp": "2025-09-11T14:59:31.201Z",
+  "overallScore": 8.433333333333334,
+  "categoryScores": {
+    "Performance": 10,
+    "Security": 5.5,
+    "Functionality": 10,
+    "Code Quality": 9,
+    "User Experience": 6.4,
+    "Accessibility": 8,
+    "Data Management": 8.333333333333334,
+    "Deployment": 9.666666666666666,
+    "Monitoring": 9
+  },
+  "results": [
+    {
+      "category": "Performance",
+      "subcategory": "Page Load Time",
+      "score": 10,
+      "details": "Initial page load: 8ms",
+      "timestamp": "2025-09-11T14:59:31.189Z"
+    },
+    {
+      "category": "Performance",
+      "subcategory": "Response Size",
+      "score": 10,
+      "details": "HTML response size: 0.00KB",
+      "timestamp": "2025-09-11T14:59:31.189Z"
+    },
+    {
+      "category": "Performance",
+      "subcategory": "API Response Time",
+      "score": 10,
+      "details": "Analytics API response: 3ms",
+      "timestamp": "2025-09-11T14:59:31.192Z"
+    },
+    {
+      "category": "Security",
+      "subcategory": "Content Security Policy",
+      "score": 3,
+      "details": "No CSP header found",
+      "timestamp": "2025-09-11T14:59:31.193Z"
+    },
+    {
+      "category": "Security",
+      "subcategory": "X-Frame-Options",
+      "score": 5,
+      "details": "No X-Frame-Options header",
+      "timestamp": "2025-09-11T14:59:31.193Z"
+    },
+    {
+      "category": "Security",
+      "subcategory": "HTTPS Usage",
+      "score": 4,
+      "details": "Not using HTTPS (local dev)",
+      "timestamp": "2025-09-11T14:59:31.193Z"
+    },
+    {
+      "category": "Security",
+      "subcategory": "Sensitive Data Exposure",
+      "score": 10,
+      "details": "No sensitive data found in HTML",
+      "timestamp": "2025-09-11T14:59:31.193Z"
+    },
+    {
+      "category": "Functionality",
+      "subcategory": "Document Data",
+      "score": 10,
+      "details": "Document data file exists",
+      "timestamp": "2025-09-11T14:59:31.193Z"
+    },
+    {
+      "category": "Functionality",
+      "subcategory": "Document Count",
+      "score": 10,
+      "details": "Found 547 documents in data file",
+      "timestamp": "2025-09-11T14:59:31.198Z"
+    },
+    {
+      "category": "Functionality",
+      "subcategory": "Calculator Store",
+      "score": 10,
+      "details": "Calculator store configured",
+      "timestamp": "2025-09-11T14:59:31.198Z"
+    },
+    {
+      "category": "Functionality",
+      "subcategory": "Analytics Service",
+      "score": 10,
+      "details": "Analytics service implemented",
+      "timestamp": "2025-09-11T14:59:31.198Z"
+    },
+    {
+      "category": "Code Quality",
+      "subcategory": "TypeScript Usage",
+      "score": 10,
+      "details": "TypeScript configured",
+      "timestamp": "2025-09-11T14:59:31.199Z"
+    },
+    {
+      "category": "Code Quality",
+      "subcategory": "Test Coverage",
+      "score": 8,
+      "details": "Test directory exists",
+      "timestamp": "2025-09-11T14:59:31.199Z"
+    },
+    {
+      "category": "Code Quality",
+      "subcategory": "Linting Setup",
+      "score": 10,
+      "details": "ESLint configured",
+      "timestamp": "2025-09-11T14:59:31.199Z"
+    },
+    {
+      "category": "Code Quality",
+      "subcategory": "Documentation",
+      "score": 8,
+      "details": "README.md exists",
+      "timestamp": "2025-09-11T14:59:31.199Z"
+    },
+    {
+      "category": "User Experience",
+      "subcategory": "Mobile Responsiveness",
+      "score": 3,
+      "details": "No viewport configuration",
+      "timestamp": "2025-09-11T14:59:31.200Z"
+    },
+    {
+      "category": "User Experience",
+      "subcategory": "Loading States",
+      "score": 5,
+      "details": "No loading states found",
+      "timestamp": "2025-09-11T14:59:31.200Z"
+    },
+    {
+      "category": "User Experience",
+      "subcategory": "Error Handling",
+      "score": 4,
+      "details": "Limited error handling",
+      "timestamp": "2025-09-11T14:59:31.200Z"
+    },
+    {
+      "category": "User Experience",
+      "subcategory": "Search Functionality",
+      "score": 10,
+      "details": "Search functionality implemented",
+      "timestamp": "2025-09-11T14:59:31.200Z"
+    },
+    {
+      "category": "User Experience",
+      "subcategory": "Analytics Dashboard",
+      "score": 10,
+      "details": "Analytics dashboard available",
+      "timestamp": "2025-09-11T14:59:31.200Z"
+    },
+    {
+      "category": "Accessibility",
+      "subcategory": "ARIA Labels",
+      "score": 7,
+      "details": "Partial ARIA implementation",
+      "timestamp": "2025-09-11T14:59:31.200Z"
+    },
+    {
+      "category": "Accessibility",
+      "subcategory": "Keyboard Navigation",
+      "score": 8,
+      "details": "Most elements keyboard accessible",
+      "timestamp": "2025-09-11T14:59:31.200Z"
+    },
+    {
+      "category": "Accessibility",
+      "subcategory": "Color Contrast",
+      "score": 9,
+      "details": "Good contrast ratios",
+      "timestamp": "2025-09-11T14:59:31.200Z"
+    },
+    {
+      "category": "Data Management",
+      "subcategory": "Database Integration",
+      "score": 10,
+      "details": "SQLite database configured",
+      "timestamp": "2025-09-11T14:59:31.200Z"
+    },
+    {
+      "category": "Data Management",
+      "subcategory": "Data Validation",
+      "score": 8,
+      "details": "Input validation present",
+      "timestamp": "2025-09-11T14:59:31.200Z"
+    },
+    {
+      "category": "Data Management",
+      "subcategory": "Caching Strategy",
+      "score": 7,
+      "details": "Basic caching implemented",
+      "timestamp": "2025-09-11T14:59:31.200Z"
+    },
+    {
+      "category": "Deployment",
+      "subcategory": "Docker Support",
+      "score": 10,
+      "details": "Dockerfile configured",
+      "timestamp": "2025-09-11T14:59:31.200Z"
+    },
+    {
+      "category": "Deployment",
+      "subcategory": "CI/CD Pipeline",
+      "score": 9,
+      "details": "Azure deployment configured",
+      "timestamp": "2025-09-11T14:59:31.200Z"
+    },
+    {
+      "category": "Deployment",
+      "subcategory": "Environment Config",
+      "score": 10,
+      "details": "Environment variables supported",
+      "timestamp": "2025-09-11T14:59:31.200Z"
+    },
+    {
+      "category": "Monitoring",
+      "subcategory": "Error Tracking",
+      "score": 8,
+      "details": "Basic error tracking",
+      "timestamp": "2025-09-11T14:59:31.200Z"
+    },
+    {
+      "category": "Monitoring",
+      "subcategory": "Performance Metrics",
+      "score": 9,
+      "details": "Web vitals tracked",
+      "timestamp": "2025-09-11T14:59:31.200Z"
+    },
+    {
+      "category": "Monitoring",
+      "subcategory": "User Analytics",
+      "score": 10,
+      "details": "Comprehensive analytics",
+      "timestamp": "2025-09-11T14:59:31.200Z"
+    }
+  ]
+}

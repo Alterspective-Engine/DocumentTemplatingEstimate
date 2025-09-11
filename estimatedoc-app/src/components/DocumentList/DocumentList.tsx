@@ -3,6 +3,7 @@ import { useDocumentStore } from '../../store/documentStore';
 import { DocumentCard } from '../DocumentCard/DocumentCard';
 import { DocumentDetail } from '../DocumentDetail/DocumentDetail';
 import { Search, Filter, SortAsc, SortDesc, X } from 'lucide-react';
+import { useAnalytics } from '../../hooks/useAnalytics';
 import './DocumentList.css';
 
 export const DocumentList: React.FC = () => {
@@ -19,28 +20,43 @@ export const DocumentList: React.FC = () => {
 
   const [searchTerm, setSearchTerm] = useState('');
   const [showFilters, setShowFilters] = useState(false);
+  
+  const { trackSearch, trackFilter, trackSort, trackDocumentView } = useAnalytics();
 
   const stats = getStatistics();
 
   const handleSearch = (value: string) => {
     setSearchTerm(value);
     setFilter({ ...filter, searchTerm: value });
+    
+    // Track search analytics
+    if (value) {
+      trackSearch(value, filteredDocuments.length);
+    }
   };
 
   const handleComplexityFilter = (complexity: 'Simple' | 'Moderate' | 'Complex' | null) => {
     setFilter({ ...filter, complexity });
+    trackFilter('complexity', complexity);
   };
 
   const handleSourceFilter = (source: 'SQL' | 'Estimated' | null) => {
     setFilter({ ...filter, source });
+    trackFilter('source', source);
   };
 
   const handleSort = (field: typeof sort.field) => {
-    if (sort.field === field) {
-      setSort({ field, direction: sort.direction === 'asc' ? 'desc' : 'asc' });
-    } else {
-      setSort({ field, direction: 'asc' });
-    }
+    const newDirection = sort.field === field 
+      ? (sort.direction === 'asc' ? 'desc' : 'asc')
+      : 'asc';
+    
+    setSort({ field, direction: newDirection });
+    trackSort(field, newDirection);
+  };
+  
+  const handleDocumentClick = (document: any) => {
+    setSelectedDocument(document);
+    trackDocumentView(document.id, document.name);
   };
 
   const clearFilters = () => {
@@ -195,7 +211,7 @@ export const DocumentList: React.FC = () => {
           <DocumentCard
             key={document.id}
             document={document}
-            onClick={setSelectedDocument}
+            onClick={handleDocumentClick}
             selected={selectedDocument?.id === document.id}
           />
         ))}

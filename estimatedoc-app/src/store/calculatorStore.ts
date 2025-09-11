@@ -7,6 +7,14 @@ interface CalculatorStore {
   settings: CalculatorSettings;
   isOpen: boolean;
   originalSettings: CalculatorSettings | null;
+  previewActive: boolean;
+  previewImpact: {
+    totalDocuments: number;
+    totalHoursBefore: number;
+    totalHoursAfter: number;
+    totalSavings: number;
+    percentChange: number;
+  } | null;
   
   // Actions
   openCalculator: () => void;
@@ -17,9 +25,10 @@ interface CalculatorStore {
   updateOptimization: (field: keyof CalculatorSettings['optimization'], value: number) => void;
   resetToDefaults: () => void;
   applySettings: () => void;
+  calculatePreviewImpact: () => void;
   
   // Calculations
-  recalculateDocument: (document: Document) => Document;
+  recalculateDocument: (document: Document, customSettings?: CalculatorSettings | null) => Document;
 }
 
 const defaultSettings: CalculatorSettings = {
@@ -67,9 +76,20 @@ export const useCalculatorStore = create<CalculatorStore>((set, get) => ({
   settings: defaultSettings,
   isOpen: false,
   originalSettings: null,
+  previewActive: false,
+  previewImpact: null,
   
-  openCalculator: () => set({ isOpen: true, originalSettings: get().settings }),
-  closeCalculator: () => set({ isOpen: false, originalSettings: null }),
+  openCalculator: () => set({ 
+    isOpen: true, 
+    originalSettings: get().settings,
+    previewActive: true
+  }),
+  closeCalculator: () => set({ 
+    isOpen: false, 
+    originalSettings: null,
+    previewActive: false,
+    previewImpact: null
+  }),
   
   updateFieldTime: (field, value) => {
     const { settings } = get();
@@ -85,6 +105,8 @@ export const useCalculatorStore = create<CalculatorStore>((set, get) => ({
         }
       }
     });
+    // Trigger preview calculation
+    get().calculatePreviewImpact();
   },
   
   updateComplexityThreshold: (complexity, field, value) => {
@@ -101,6 +123,8 @@ export const useCalculatorStore = create<CalculatorStore>((set, get) => ({
         }
       }
     });
+    // Trigger preview calculation
+    get().calculatePreviewImpact();
   },
   
   updateComplexityMultiplier: (complexity, value) => {
@@ -117,6 +141,8 @@ export const useCalculatorStore = create<CalculatorStore>((set, get) => ({
         }
       }
     });
+    // Trigger preview calculation
+    get().calculatePreviewImpact();
   },
   
   updateOptimization: (field, value) => {
@@ -133,21 +159,65 @@ export const useCalculatorStore = create<CalculatorStore>((set, get) => ({
         }
       }
     });
+    // Trigger preview calculation
+    get().calculatePreviewImpact();
   },
   
   resetToDefaults: () => set({ settings: defaultSettings }),
   
   applySettings: () => {
     const { settings } = get();
-    set({ originalSettings: settings });
+    set({ originalSettings: settings, previewActive: false, previewImpact: null });
     
     // Trigger live recalculation of all documents
     const documentStore = useDocumentStore.getState();
     documentStore.recalculateAllDocuments(settings);
   },
   
-  recalculateDocument: (document) => {
-    const { settings } = get();
+  calculatePreviewImpact: () => {
+    const { settings, originalSettings } = get();
+    
+    if (!originalSettings) {
+      set({ previewImpact: null });
+      return;
+    }
+    
+    // Get all documents from document store
+    const documentStore = useDocumentStore.getState();
+    const documents = documentStore.documents;
+    
+    // Calculate total hours with original settings
+    let totalHoursBefore = 0;
+    let totalHoursAfter = 0;
+    
+    documents.forEach(doc => {
+      // Calculate with original settings
+      const originalDoc = get().recalculateDocument(doc, originalSettings);
+      totalHoursBefore += originalDoc.effort.optimized;
+      
+      // Calculate with new settings  
+      const newDoc = get().recalculateDocument(doc, settings);
+      totalHoursAfter += newDoc.effort.optimized;
+    });
+    
+    const totalSavings = totalHoursBefore - totalHoursAfter;
+    const percentChange = totalHoursBefore > 0 
+      ? ((totalHoursAfter - totalHoursBefore) / totalHoursBefore) * 100 
+      : 0;
+    
+    set({
+      previewImpact: {
+        totalDocuments: documents.length,
+        totalHoursBefore: Math.round(totalHoursBefore),
+        totalHoursAfter: Math.round(totalHoursAfter),
+        totalSavings: Math.round(totalSavings),
+        percentChange: Math.round(percentChange * 10) / 10
+      }
+    });
+  },
+  
+  recalculateDocument: (document, customSettings = null) => {
+    const settings = customSettings || get().settings;
     
     // Calculate total time based on field counts and current settings
     const fieldTime = 

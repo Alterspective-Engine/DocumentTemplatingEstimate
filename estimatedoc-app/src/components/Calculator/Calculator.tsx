@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { useCalculatorStore } from '../../store/calculatorStore';
+import { useDebounce } from '../../hooks/useDebounce';
+import { useAnalytics } from '../../hooks/useAnalytics';
 import { X, Calculator as CalcIcon, RotateCcw, Save } from 'lucide-react';
 import './Calculator.css';
 
@@ -7,20 +9,48 @@ export const Calculator: React.FC = () => {
   const {
     settings,
     isOpen,
+    previewImpact,
     closeCalculator,
     updateFieldTime,
     updateComplexityThreshold,
     updateComplexityMultiplier,
     updateOptimization,
     resetToDefaults,
-    applySettings
+    applySettings,
+    calculatePreviewImpact
   } = useCalculatorStore();
+  
+  const { trackCalculatorUsage, trackClick } = useAnalytics();
+
+  // Calculate preview on initial open
+  useEffect(() => {
+    if (isOpen) {
+      calculatePreviewImpact();
+      trackClick('calculator_open');
+    }
+  }, [isOpen, calculatePreviewImpact]);
+
+  // Debounce settings for preview calculation
+  const debouncedSettings = useDebounce(settings, 300);
+  
+  // Trigger preview calculation when settings change
+  useEffect(() => {
+    if (isOpen && debouncedSettings) {
+      calculatePreviewImpact();
+    }
+  }, [debouncedSettings, isOpen, calculatePreviewImpact]);
 
   if (!isOpen) return null;
 
   const handleApply = () => {
     applySettings();
+    trackCalculatorUsage(settings);
     closeCalculator();
+  };
+  
+  const handleReset = () => {
+    resetToDefaults();
+    trackClick('calculator_reset');
   };
 
   return (
@@ -35,6 +65,38 @@ export const Calculator: React.FC = () => {
             <X size={24} />
           </button>
         </div>
+
+        {/* Live Preview Panel */}
+        {previewImpact && (
+          <div className="preview-impact-panel">
+            <div className="preview-header">
+              <h3 className="label-large">Live Impact Preview</h3>
+              <span className="label-small">Changes will be applied when you click "Apply Settings"</span>
+            </div>
+            <div className="preview-metrics">
+              <div className="metric-card">
+                <span className="metric-label">Current Total</span>
+                <span className="metric-value">{previewImpact.totalHoursBefore.toLocaleString()} hrs</span>
+              </div>
+              <div className="metric-card">
+                <span className="metric-label">New Total</span>
+                <span className="metric-value highlight">{previewImpact.totalHoursAfter.toLocaleString()} hrs</span>
+              </div>
+              <div className="metric-card">
+                <span className="metric-label">Impact</span>
+                <span className={`metric-value ${previewImpact.percentChange < 0 ? 'positive' : 'negative'}`}>
+                  {previewImpact.percentChange > 0 ? '+' : ''}{previewImpact.percentChange}%
+                </span>
+              </div>
+              <div className="metric-card">
+                <span className="metric-label">Difference</span>
+                <span className={`metric-value ${previewImpact.totalSavings > 0 ? 'positive' : 'negative'}`}>
+                  {previewImpact.totalSavings > 0 ? '-' : '+'}{Math.abs(previewImpact.totalSavings).toLocaleString()} hrs
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="calculator-content">
           {/* Field Time Estimates */}
@@ -203,7 +265,7 @@ export const Calculator: React.FC = () => {
         </div>
 
         <div className="calculator-footer">
-          <button className="button-secondary" onClick={resetToDefaults}>
+          <button className="button-secondary" onClick={handleReset}>
             <RotateCcw size={18} />
             Reset to Defaults
           </button>
