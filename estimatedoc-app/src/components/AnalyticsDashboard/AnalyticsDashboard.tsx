@@ -18,9 +18,9 @@ export const AnalyticsDashboard: React.FC = () => {
   const stats = getStatistics();
   
   // Get history for global metrics
-  const effortHistory = globalHistory.map(h => h.totalEffort);
-  const savingsHistory = globalHistory.map(h => h.totalSavings);
-  const reusabilityHistory = globalHistory.map(h => h.averageReusability);
+  const effortHistory = globalHistory.totalEffort.map(h => h.value);
+  const savingsHistory = globalHistory.totalSavings.map(h => h.value);
+  const reusabilityHistory = globalHistory.averageReusability.map(h => h.value);
 
   // Calculate advanced analytics
   const analytics = useMemo(() => {

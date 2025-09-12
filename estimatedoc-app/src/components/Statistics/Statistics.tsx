@@ -14,10 +14,10 @@ export const Statistics: React.FC = () => {
   const { globalHistory } = useHistoryStore();
   
   // Get history for global metrics
-  const effortHistory = globalHistory.map(h => h.totalEffort);
-  const optimizedHistory = globalHistory.map(h => h.totalOptimized);
-  const savingsHistory = globalHistory.map(h => h.totalSavings);
-  const reusabilityHistory = globalHistory.map(h => h.averageReusability);
+  const effortHistory = globalHistory.totalEffort.map(h => h.value);
+  const optimizedHistory = globalHistory.totalOptimized.map(h => h.value);
+  const savingsHistory = globalHistory.totalSavings.map(h => h.value);
+  const reusabilityHistory = globalHistory.averageReusability.map(h => h.value);
 
   // Calculate statistics
   const complexityData = [

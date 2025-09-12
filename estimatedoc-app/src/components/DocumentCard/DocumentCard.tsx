@@ -22,14 +22,14 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({
   const [isUpdating, setIsUpdating] = useState(false);
   const [showChange, setShowChange] = useState(false);
   
-  const history = getDocumentHistory(document.id);
+  const history = getDocumentHistory(document.id.toString());
   const effortHistory = history?.effort.map(h => h.value) || [];
   const optimizedHistory = history?.optimized.map(h => h.value) || [];
   const fieldsHistory = history?.fields.map(h => h.value) || [];
   
   // Check if this document is updating
   useEffect(() => {
-    const updating = updatingDocuments.has(document.id);
+    const updating = updatingDocuments.has(document.id.toString());
     setIsUpdating(updating);
     
     if (updating) {

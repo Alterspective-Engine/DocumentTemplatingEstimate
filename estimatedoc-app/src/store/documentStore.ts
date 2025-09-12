@@ -161,7 +161,7 @@ export const useDocumentStore = create<DocumentStore>((set, get) => {
     
     // Record history for each document
     documents.forEach(doc => {
-      historyStore.recordDocumentChange(doc.id, doc.name, {
+      historyStore.recordDocumentChange(doc.id.toString(), doc.name, {
         effort: doc.effort.calculated,
         optimized: doc.effort.optimized,
         savings: doc.effort.savings,
@@ -199,7 +199,7 @@ export const useDocumentStore = create<DocumentStore>((set, get) => {
     
     // Record current state to history
     documents.forEach(doc => {
-      historyStore.recordDocumentChange(doc.id, doc.name, {
+      historyStore.recordDocumentChange(doc.id.toString(), doc.name, {
         effort: doc.effort.calculated,
         optimized: doc.effort.optimized,
         savings: doc.effort.savings,
@@ -213,7 +213,7 @@ export const useDocumentStore = create<DocumentStore>((set, get) => {
     
     for (let i = 0; i < documents.length; i += batchSize) {
       const batch = documents.slice(i, i + batchSize);
-      const updatingIds = new Set(batch.map(d => d.id));
+      const updatingIds = new Set(batch.map(d => d.id.toString()));
       
       // Mark documents as updating
       set({ updatingDocuments: updatingIds });
