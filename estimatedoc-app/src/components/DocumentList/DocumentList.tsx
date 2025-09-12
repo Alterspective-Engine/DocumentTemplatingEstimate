@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useDocumentStore } from '../../store/documentStore';
 import { DocumentCard } from '../DocumentCard/DocumentCard';
 import { DocumentDetail } from '../DocumentDetail/DocumentDetail';
@@ -18,22 +18,43 @@ export const DocumentList: React.FC = () => {
     getStatistics
   } = useDocumentStore();
 
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState(filter.searchTerm || '');
   const [showFilters, setShowFilters] = useState(false);
+  const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
   
   const { trackSearch, trackFilter, trackSort, trackDocumentView } = useAnalytics();
 
   const stats = getStatistics();
 
-  const handleSearch = (value: string) => {
+  const handleSearch = useCallback((value: string) => {
     setSearchTerm(value);
-    setFilter({ ...filter, searchTerm: value });
     
-    // Track search analytics
-    if (value) {
-      trackSearch(value, filteredDocuments.length);
+    // Clear existing timeout
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
     }
-  };
+    
+    // Set new timeout for debounced search
+    const newTimeout = setTimeout(() => {
+      setFilter({ ...filter, searchTerm: value });
+      
+      // Track search analytics
+      if (value) {
+        trackSearch(value, filteredDocuments.length);
+      }
+    }, 300); // 300ms debounce
+    
+    setSearchTimeout(newTimeout);
+  }, [filter, filteredDocuments.length, searchTimeout, trackSearch]);
+  
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (searchTimeout) {
+        clearTimeout(searchTimeout);
+      }
+    };
+  }, [searchTimeout]);
 
   const handleComplexityFilter = (complexity: 'Simple' | 'Moderate' | 'Complex' | null) => {
     setFilter({ ...filter, complexity });
@@ -60,8 +81,17 @@ export const DocumentList: React.FC = () => {
   };
 
   const clearFilters = () => {
+    // Clear any pending search timeout
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
+      setSearchTimeout(null);
+    }
+    
     setSearchTerm('');
     setFilter({});
+    // Force re-apply filters to reset the list
+    const store = useDocumentStore.getState();
+    store.applyFiltersAndSort();
   };
 
   return (
@@ -79,7 +109,15 @@ export const DocumentList: React.FC = () => {
           />
           {searchTerm && (
             <button 
-              onClick={() => handleSearch('')}
+              onClick={() => {
+                // Clear any pending search timeout
+                if (searchTimeout) {
+                  clearTimeout(searchTimeout);
+                  setSearchTimeout(null);
+                }
+                setSearchTerm('');
+                setFilter({ ...filter, searchTerm: '' });
+              }}
               className="clear-search"
               aria-label="Clear search"
             >
