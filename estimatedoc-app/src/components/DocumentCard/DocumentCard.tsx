@@ -1,6 +1,9 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import type { Document } from '../../types/document.types';
-import { FileText, Clock, Layers, TrendingUp, CheckCircle, AlertCircle } from 'lucide-react';
+import { FileText, Clock, Layers, TrendingUp, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
+import { useDocumentStore } from '../../store/documentStore';
+import { useHistoryStore } from '../../store/historyStore';
+import { MiniGraph } from '../MiniGraph/MiniGraph';
 import './DocumentCard.css';
 
 interface DocumentCardProps {
@@ -14,6 +17,27 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({
   onClick, 
   selected = false 
 }) => {
+  const { updatingDocuments } = useDocumentStore();
+  const { getDocumentHistory } = useHistoryStore();
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [showChange, setShowChange] = useState(false);
+  
+  const history = getDocumentHistory(document.id);
+  const effortHistory = history?.effort.map(h => h.value) || [];
+  const optimizedHistory = history?.optimized.map(h => h.value) || [];
+  const fieldsHistory = history?.fields.map(h => h.value) || [];
+  
+  // Check if this document is updating
+  useEffect(() => {
+    const updating = updatingDocuments.has(document.id);
+    setIsUpdating(updating);
+    
+    if (updating) {
+      setShowChange(true);
+      const timer = setTimeout(() => setShowChange(false), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [updatingDocuments, document.id]);
   const getComplexityColor = (level: string) => {
     switch (level) {
       case 'Simple': return 'success';
@@ -30,9 +54,15 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({
 
   return (
     <div 
-      className={`document-card ${selected ? 'selected' : ''}`}
+      className={`document-card ${selected ? 'selected' : ''} ${isUpdating ? 'updating' : ''}`}
       onClick={() => onClick(document)}
     >
+      {isUpdating && (
+        <div className="update-indicator">
+          <RefreshCw size={14} className="spin" />
+          <span>Updating...</span>
+        </div>
+      )}
       <div className="card-header">
         <div className="card-title-group">
           <FileText size={20} className="card-icon" />
@@ -48,19 +78,41 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({
       </p>
       
       <div className="card-metrics">
-        <div className="metric">
+        <div className={`metric ${showChange ? 'value-changed' : ''}`}>
           <Layers size={16} className="metric-icon" />
           <div className="metric-content">
             <span className="label-small">Fields</span>
-            <span className="body-large">{document.totals.allFields}</span>
+            <div className="metric-value-with-graph">
+              <span className="body-large">{document.totals.allFields}</span>
+              {fieldsHistory.length > 1 && (
+                <MiniGraph 
+                  data={fieldsHistory} 
+                  width={40} 
+                  height={16}
+                  color="#B8B8B8"
+                  showTrend={false}
+                />
+              )}
+            </div>
           </div>
         </div>
         
-        <div className="metric">
+        <div className={`metric ${showChange ? 'value-changed' : ''}`}>
           <Clock size={16} className="metric-icon" />
           <div className="metric-content">
             <span className="label-small">Effort</span>
-            <span className="body-large">{formatHours(document.effort.calculated)}</span>
+            <div className="metric-value-with-graph">
+              <span className="body-large">{formatHours(document.effort.calculated)}</span>
+              {effortHistory.length > 1 && (
+                <MiniGraph 
+                  data={effortHistory} 
+                  width={40} 
+                  height={16}
+                  color="#FFD93D"
+                  showTrend={false}
+                />
+              )}
+            </div>
           </div>
         </div>
         

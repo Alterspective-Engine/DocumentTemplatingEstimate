@@ -222,6 +222,22 @@
   line-height: 1;
 }
 
+/* Value with graph styling */
+.metric-value-with-graph {
+  display: flex;
+  align-items: center;
+  gap: var(--md-sys-spacing-sm);
+}
+
+.metric-value-with-graph .mini-graph-container {
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+
+.metric-value-with-graph:hover .mini-graph-container {
+  opacity: 1;
+}
+
 .metric-label {
   font-family: 'Montserrat', sans-serif;
   font-weight: 500;

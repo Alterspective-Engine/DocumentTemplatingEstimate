@@ -2,6 +2,8 @@ import { create } from 'zustand';
 import type { Document } from '../types/document.types';
 import type { CalculatorSettings } from '../types/calculator.types';
 import { documentsData } from '../data/documents';
+import { useCalculatorStore } from './calculatorStore';
+import { useHistoryStore } from './historyStore';
 
 interface DocumentFilter {
   complexity?: 'Simple' | 'Moderate' | 'Complex' | null;
@@ -23,6 +25,9 @@ interface DocumentStore {
   selectedDocument: Document | null;
   filter: DocumentFilter;
   sort: DocumentSort;
+  isRecalculating: boolean;
+  recalculationProgress: number;
+  updatingDocuments: Set<string>;
   
   // Actions
   setSelectedDocument: (document: Document | null) => void;
@@ -30,6 +35,7 @@ interface DocumentStore {
   setSort: (sort: DocumentSort) => void;
   applyFiltersAndSort: () => void;
   recalculateAllDocuments: (settings: CalculatorSettings) => void;
+  recalculateAllDocumentsLive: (settings: CalculatorSettings) => Promise<void>;
   
   // Statistics
   getStatistics: () => {
@@ -41,12 +47,30 @@ interface DocumentStore {
   };
 }
 
-export const useDocumentStore = create<DocumentStore>((set, get) => ({
-  documents: documentsData,
-  filteredDocuments: documentsData,
-  selectedDocument: null,
-  filter: {},
-  sort: { field: 'name', direction: 'asc' },
+// Initialize documents with calculated values
+const initializeDocuments = () => {
+  const calculatorStore = useCalculatorStore.getState();
+  const settings = calculatorStore.settings;
+  
+  // Calculate all documents with current settings
+  return documentsData.map(doc => {
+    return calculatorStore.recalculateDocument(doc, settings);
+  });
+};
+
+export const useDocumentStore = create<DocumentStore>((set, get) => {
+  // Initialize with calculated documents
+  const initialDocs = initializeDocuments();
+  
+  return {
+    documents: initialDocs,
+    filteredDocuments: initialDocs,
+    selectedDocument: null,
+    filter: {},
+    sort: { field: 'name', direction: 'asc' },
+    isRecalculating: false,
+    recalculationProgress: 0,
+    updatingDocuments: new Set(),
   
   setSelectedDocument: (document) => set({ selectedDocument: document }),
   
@@ -132,75 +156,112 @@ export const useDocumentStore = create<DocumentStore>((set, get) => ({
   
   recalculateAllDocuments: (settings) => {
     const { documents } = get();
+    const calculatorStore = useCalculatorStore.getState();
+    const historyStore = useHistoryStore.getState();
     
-    // Recalculate all documents with new settings
+    // Record history for each document
+    documents.forEach(doc => {
+      historyStore.recordDocumentChange(doc.id, doc.name, {
+        effort: doc.effort.calculated,
+        optimized: doc.effort.optimized,
+        savings: doc.effort.savings,
+        complexity: doc.complexity.level,
+        fields: doc.totals.allFields
+      });
+    });
+    
+    // Use the calculator store's calculation method for consistency
     const recalculatedDocs = documents.map(doc => {
-      // Calculate total time based on field counts and current settings
-      const fieldTime = 
-        doc.fields.if.count * (settings.fieldTimeEstimates.ifStatement.current / 60) +
-        doc.fields.precedentScript.count * (settings.fieldTimeEstimates.precedentScript.current / 60) +
-        doc.fields.reflection.count * (settings.fieldTimeEstimates.reflection.current / 60) +
-        doc.fields.search.count * (settings.fieldTimeEstimates.search.current / 60) +
-        doc.fields.unbound.count * (settings.fieldTimeEstimates.unbound.current / 60) +
-        doc.fields.builtInScript.count * (settings.fieldTimeEstimates.builtInScript.current / 60) +
-        doc.fields.extended.count * (settings.fieldTimeEstimates.extended.current / 60) +
-        doc.fields.scripted.count * (settings.fieldTimeEstimates.scripted.current / 60);
-      
-      // Determine complexity based on current thresholds
-      const totalFields = doc.totals.allFields;
-      const totalScripts = doc.fields.precedentScript.count + 
-                          doc.fields.builtInScript.count + 
-                          doc.fields.scripted.count;
-      const ifStatements = doc.fields.if.count;
-      
-      let complexity: 'Simple' | 'Moderate' | 'Complex';
-      let complexityReason: string;
-      
-      if (totalFields < settings.complexityThresholds.simple.maxFields &&
-          totalScripts <= settings.complexityThresholds.simple.maxScripts &&
-          ifStatements <= settings.complexityThresholds.simple.maxIfStatements) {
-        complexity = 'Simple';
-        complexityReason = `<${settings.complexityThresholds.simple.maxFields} fields, ≤${settings.complexityThresholds.simple.maxScripts} scripts, ≤${settings.complexityThresholds.simple.maxIfStatements} IFs`;
-      } else if (totalFields >= settings.complexityThresholds.moderate.minFields &&
-                 totalFields <= settings.complexityThresholds.moderate.maxFields &&
-                 totalScripts < settings.complexityThresholds.moderate.maxScripts &&
-                 ifStatements <= settings.complexityThresholds.moderate.maxIfStatements) {
-        complexity = 'Moderate';
-        complexityReason = `${settings.complexityThresholds.moderate.minFields}-${settings.complexityThresholds.moderate.maxFields} fields, <${settings.complexityThresholds.moderate.maxScripts} scripts, ≤${settings.complexityThresholds.moderate.maxIfStatements} IFs`;
-      } else {
-        complexity = 'Complex';
-        complexityReason = `Exceeds moderate thresholds`;
-      }
-      
-      // Apply complexity multiplier
-      const multiplier = settings.complexityMultipliers[complexity.toLowerCase() as 'simple' | 'moderate' | 'complex'].current;
-      const calculatedHours = fieldTime * multiplier;
-      
-      // Calculate optimization
-      const reuseRate = parseFloat(doc.totals.reuseRate) / 100;
-      const optimizationFactor = settings.optimization.reuseEfficiency.current / 100;
-      const savings = calculatedHours * reuseRate * optimizationFactor;
-      const optimizedHours = calculatedHours - savings;
-      
-      // Return updated document
-      return {
-        ...doc,
-        complexity: {
-          ...doc.complexity,
-          level: complexity,
-          reason: complexityReason
-        },
-        effort: {
-          ...doc.effort,
-          calculated: calculatedHours,
-          optimized: optimizedHours,
-          savings
-        }
-      };
+      return calculatorStore.recalculateDocument(doc, settings);
+    });
+    
+    // Record global history
+    const stats = get().getStatistics();
+    historyStore.recordGlobalChange({
+      totalEffort: stats.totalEffort,
+      totalOptimized: stats.totalOptimizedEffort,
+      totalSavings: stats.totalEffort - stats.totalOptimizedEffort,
+      averageReusability: stats.averageReusability,
+      documentCount: stats.total
     });
     
     set({ documents: recalculatedDocs });
     get().applyFiltersAndSort();
+  },
+  
+  recalculateAllDocumentsLive: async (settings) => {
+    const { documents } = get();
+    const calculatorStore = useCalculatorStore.getState();
+    const historyStore = useHistoryStore.getState();
+    const batchSize = 20; // Process in batches for smooth animation
+    
+    set({ isRecalculating: true, recalculationProgress: 0, updatingDocuments: new Set() });
+    
+    // Record current state to history
+    documents.forEach(doc => {
+      historyStore.recordDocumentChange(doc.id, doc.name, {
+        effort: doc.effort.calculated,
+        optimized: doc.effort.optimized,
+        savings: doc.effort.savings,
+        complexity: doc.complexity.level,
+        fields: doc.totals.allFields
+      });
+    });
+    
+    const recalculatedDocs = [...documents];
+    const totalBatches = Math.ceil(documents.length / batchSize);
+    
+    for (let i = 0; i < documents.length; i += batchSize) {
+      const batch = documents.slice(i, i + batchSize);
+      const updatingIds = new Set(batch.map(d => d.id));
+      
+      // Mark documents as updating
+      set({ updatingDocuments: updatingIds });
+      
+      // Animate the update
+      await new Promise(resolve => setTimeout(resolve, 50));
+      
+      // Recalculate batch
+      batch.forEach((doc, index) => {
+        const globalIndex = i + index;
+        recalculatedDocs[globalIndex] = calculatorStore.recalculateDocument(doc, settings);
+      });
+      
+      // Update progress
+      const progress = Math.min(100, ((i + batchSize) / documents.length) * 100);
+      set({ 
+        documents: recalculatedDocs,
+        recalculationProgress: progress,
+        updatingDocuments: new Set()
+      });
+      
+      // Apply filters after each batch
+      get().applyFiltersAndSort();
+      
+      // Small delay for visual effect
+      await new Promise(resolve => setTimeout(resolve, 10));
+    }
+    
+    // Record new global history
+    const stats = get().getStatistics();
+    historyStore.recordGlobalChange({
+      totalEffort: stats.totalEffort,
+      totalOptimized: stats.totalOptimizedEffort,
+      totalSavings: stats.totalEffort - stats.totalOptimizedEffort,
+      averageReusability: stats.averageReusability,
+      documentCount: stats.total
+    });
+    
+    set({ 
+      isRecalculating: false, 
+      recalculationProgress: 100,
+      updatingDocuments: new Set()
+    });
+    
+    // Clear progress after animation
+    setTimeout(() => {
+      set({ recalculationProgress: 0 });
+    }, 500);
   },
   
   getStatistics: () => {
@@ -226,4 +287,5 @@ export const useDocumentStore = create<DocumentStore>((set, get) => ({
       averageReusability: totalReusability / filteredDocuments.length
     };
   }
-}));
+  };
+});

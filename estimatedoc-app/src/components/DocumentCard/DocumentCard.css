@@ -375,3 +375,105 @@
     border-bottom: none;
   }
 }
+
+/* Live Update Animations */
+.document-card.updating {
+  animation: cardPulse 0.6s ease-in-out;
+  border-color: var(--alterspective-citrus);
+  box-shadow: 
+    0 0 30px rgba(171, 221, 101, 0.2),
+    0 4px 12px rgba(44, 130, 72, 0.15);
+}
+
+@keyframes cardPulse {
+  0% {
+    transform: scale(1);
+    background: var(--alterspective-white);
+  }
+  50% {
+    transform: scale(1.02);
+    background: linear-gradient(135deg, 
+      rgba(171, 221, 101, 0.05) 0%, 
+      rgba(44, 130, 72, 0.02) 100%);
+  }
+  100% {
+    transform: scale(1);
+    background: var(--alterspective-white);
+  }
+}
+
+.update-indicator {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: linear-gradient(135deg, 
+    rgba(171, 221, 101, 0.95) 0%, 
+    rgba(44, 130, 72, 0.95) 100%);
+  border-radius: var(--md-sys-shape-corner-full);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--alterspective-white);
+  z-index: 10;
+  animation: slideIn 0.3s ease-out;
+  box-shadow: 0 4px 12px rgba(44, 130, 72, 0.3);
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.update-indicator .spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Value Change Animations */
+.metric.value-changed {
+  animation: valueFlash 0.6s ease;
+}
+
+@keyframes valueFlash {
+  0% { background: transparent; }
+  50% { 
+    background: linear-gradient(135deg, 
+      rgba(171, 221, 101, 0.2) 0%, 
+      rgba(44, 130, 72, 0.1) 100%);
+    transform: scale(1.05);
+  }
+  100% { 
+    background: transparent;
+    transform: scale(1);
+  }
+}
+
+/* Mini Graph Integration */
+.metric-value-with-graph {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.metric-value-with-graph .mini-graph-container {
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+
+.metric-value-with-graph:hover .mini-graph-container {
+  opacity: 1;
+}

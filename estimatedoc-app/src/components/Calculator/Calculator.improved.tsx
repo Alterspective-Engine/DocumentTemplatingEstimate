@@ -1,6 +1,5 @@
 import React, { useEffect, useCallback, useState } from 'react';
-import { useCalculatorStore, CALCULATOR_PRESETS } from '../../store/calculatorStore';
-import { useDocumentStore } from '../../store/documentStore';
+import { useCalculatorStore, CALCULATOR_PRESETS } from '../../store/calculatorStore.improved';
 import { useDebounce } from '../../hooks/useDebounce';
 import { useAnalytics } from '../../hooks/useAnalytics';
 import { 
@@ -123,7 +122,7 @@ const ComplexityBreakdown: React.FC<{ breakdown?: any }> = ({ breakdown }) => {
   );
 };
 
-export const Calculator: React.FC = () => {
+export const CalculatorImproved: React.FC = () => {
   const {
     settings,
     isOpen,
@@ -171,18 +170,11 @@ export const Calculator: React.FC = () => {
 
   if (!isOpen) return null;
 
-  const handleApply = async () => {
+  const handleApply = () => {
     if (validationErrors.length === 0) {
-      // Apply settings first
       applySettings();
       trackCalculatorUsage(settings);
-      
-      // Close calculator
       closeCalculator();
-      
-      // Trigger live recalculation with animation
-      const documentStore = useDocumentStore.getState();
-      await documentStore.recalculateAllDocumentsLive(settings);
     }
   };
   

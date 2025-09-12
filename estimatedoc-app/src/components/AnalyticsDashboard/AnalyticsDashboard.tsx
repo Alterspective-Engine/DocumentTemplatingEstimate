@@ -1,18 +1,26 @@
 import React, { useState, useMemo } from 'react';
 import { useDocumentStore } from '../../store/documentStore';
 import { useCalculatorStore } from '../../store/calculatorStore';
+import { useHistoryStore } from '../../store/historyStore';
 import { 
   TrendingUp, Activity, 
   FileText, Clock, Layers, Download,
   ChevronUp, ChevronDown, Info, Target, Zap
 } from 'lucide-react';
+import { MiniGraph } from '../MiniGraph/MiniGraph';
 import './AnalyticsDashboard.css';
 
 export const AnalyticsDashboard: React.FC = () => {
   const { filteredDocuments, getStatistics } = useDocumentStore();
   const { settings: calculatorSettings } = useCalculatorStore();
+  const { globalHistory } = useHistoryStore();
   const [activeView, setActiveView] = useState<'overview' | 'complexity' | 'efficiency' | 'fields'>('overview');
   const stats = getStatistics();
+  
+  // Get history for global metrics
+  const effortHistory = globalHistory.map(h => h.totalEffort);
+  const savingsHistory = globalHistory.map(h => h.totalSavings);
+  const reusabilityHistory = globalHistory.map(h => h.averageReusability);
 
   // Calculate advanced analytics
   const analytics = useMemo(() => {
@@ -229,7 +237,18 @@ export const AnalyticsDashboard: React.FC = () => {
                 <Clock size={24} />
               </div>
               <div className="metric-details">
-                <span className="metric-value">{formatHours(stats.totalEffort)}</span>
+                <div className="metric-value-with-graph">
+                  <span className="metric-value">{formatHours(stats.totalEffort)}</span>
+                  {effortHistory.length > 1 && (
+                    <MiniGraph 
+                      data={effortHistory} 
+                      width={50} 
+                      height={20}
+                      color="#006494"
+                      showTrend={true}
+                    />
+                  )}
+                </div>
                 <span className="metric-label">Total Effort</span>
                 <div className="metric-trend">
                   <ChevronDown size={16} />
@@ -243,7 +262,18 @@ export const AnalyticsDashboard: React.FC = () => {
                 <Zap size={24} />
               </div>
               <div className="metric-details">
-                <span className="metric-value">{formatHours(analytics.efficiencyMetrics.totalSavings)}</span>
+                <div className="metric-value-with-graph">
+                  <span className="metric-value">{formatHours(analytics.efficiencyMetrics.totalSavings)}</span>
+                  {savingsHistory.length > 1 && (
+                    <MiniGraph 
+                      data={savingsHistory} 
+                      width={50} 
+                      height={20}
+                      color="#ABDD65"
+                      showTrend={true}
+                    />
+                  )}
+                </div>
                 <span className="metric-label">Total Savings</span>
                 <div className="metric-trend positive">
                   <TrendingUp size={16} />
@@ -257,7 +287,18 @@ export const AnalyticsDashboard: React.FC = () => {
                 <Target size={24} />
               </div>
               <div className="metric-details">
-                <span className="metric-value">{formatPercentage(stats.averageReusability)}</span>
+                <div className="metric-value-with-graph">
+                  <span className="metric-value">{formatPercentage(stats.averageReusability)}</span>
+                  {reusabilityHistory.length > 1 && (
+                    <MiniGraph 
+                      data={reusabilityHistory} 
+                      width={50} 
+                      height={20}
+                      color="#2C8248"
+                      showTrend={true}
+                    />
+                  )}
+                </div>
                 <span className="metric-label">Avg Reusability</span>
                 <div className="metric-trend">
                   <Info size={16} />

@@ -1,14 +1,23 @@
 import React from 'react';
 import { useDocumentStore } from '../../store/documentStore';
+import { useHistoryStore } from '../../store/historyStore';
 import { 
   PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, 
   CartesianGrid, Tooltip, Legend, ResponsiveContainer 
 } from 'recharts';
 import { FileText, Clock, TrendingUp, Layers } from 'lucide-react';
+import { MiniGraph } from '../MiniGraph/MiniGraph';
 import './Statistics.css';
 
 export const Statistics: React.FC = () => {
   const { documents } = useDocumentStore();
+  const { globalHistory } = useHistoryStore();
+  
+  // Get history for global metrics
+  const effortHistory = globalHistory.map(h => h.totalEffort);
+  const optimizedHistory = globalHistory.map(h => h.totalOptimized);
+  const savingsHistory = globalHistory.map(h => h.totalSavings);
+  const reusabilityHistory = globalHistory.map(h => h.averageReusability);
 
   // Calculate statistics
   const complexityData = [
@@ -87,8 +96,30 @@ export const Statistics: React.FC = () => {
           </div>
           <div className="stat-content">
             <span className="label-medium">Total Effort</span>
-            <span className="display-small">{totalStats.totalEffort.toFixed(0)}h</span>
-            <span className="label-small">Optimized: {totalStats.totalOptimized.toFixed(0)}h</span>
+            <div className="stat-value-with-graph">
+              <span className="display-small">{totalStats.totalEffort.toFixed(0)}h</span>
+              {effortHistory.length > 1 && (
+                <MiniGraph 
+                  data={effortHistory} 
+                  width={60} 
+                  height={24}
+                  color="#006494"
+                  showTrend={true}
+                />
+              )}
+            </div>
+            <div className="stat-sub-value">
+              <span className="label-small">Optimized: {totalStats.totalOptimized.toFixed(0)}h</span>
+              {optimizedHistory.length > 1 && (
+                <MiniGraph 
+                  data={optimizedHistory} 
+                  width={40} 
+                  height={16}
+                  color="#65558F"
+                  showTrend={false}
+                />
+              )}
+            </div>
           </div>
         </div>
 
@@ -98,8 +129,30 @@ export const Statistics: React.FC = () => {
           </div>
           <div className="stat-content">
             <span className="label-medium">Potential Savings</span>
-            <span className="display-small">{totalStats.totalSavings.toFixed(0)}h</span>
-            <span className="label-small">Avg Reuse: {totalStats.avgReusability.toFixed(1)}%</span>
+            <div className="stat-value-with-graph">
+              <span className="display-small">{totalStats.totalSavings.toFixed(0)}h</span>
+              {savingsHistory.length > 1 && (
+                <MiniGraph 
+                  data={savingsHistory} 
+                  width={60} 
+                  height={24}
+                  color="#ABDD65"
+                  showTrend={true}
+                />
+              )}
+            </div>
+            <div className="stat-sub-value">
+              <span className="label-small">Avg Reuse: {totalStats.avgReusability.toFixed(1)}%</span>
+              {reusabilityHistory.length > 1 && (
+                <MiniGraph 
+                  data={reusabilityHistory} 
+                  width={40} 
+                  height={16}
+                  color="#2C8248"
+                  showTrend={false}
+                />
+              )}
+            </div>
           </div>
         </div>
       </div>
