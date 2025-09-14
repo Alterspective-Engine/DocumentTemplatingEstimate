@@ -45,6 +45,7 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.5);
   position: relative;
   overflow: hidden;
+  z-index: 1; /* Ensure proper stacking */
 }
 
 .list-header::after {
@@ -61,8 +62,8 @@
     transparent 70%
   );
   animation: shimmer 3s infinite;
-  pointer-events: none;
-  z-index: 0;
+  pointer-events: none !important; /* Force no pointer events */
+  z-index: -1; /* Ensure it stays behind interactive elements */
 }
 
 .search-bar {
@@ -81,7 +82,9 @@
     0 4px 16px rgba(23, 35, 45, 0.05),
     inset 0 1px 0 rgba(255, 255, 255, 0.8);
   transition: all var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-standard);
-  z-index: 1;
+  z-index: 100;
+  isolation: isolate;
+  pointer-events: auto !important; /* Ensure this element receives pointer events */
 }
 
 .search-bar:focus-within {
@@ -106,6 +109,10 @@
   color: var(--md-sys-color-on-surface);
   padding: var(--md-sys-spacing-sm) 0;
   font-family: inherit;
+  position: relative;
+  z-index: 101;
+  pointer-events: auto !important; /* Force input to receive pointer events */
+  cursor: text;
 }
 
 .clear-search {
@@ -141,6 +148,7 @@
   position: relative;
   overflow: hidden;
   transition: all var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-standard);
+  z-index: 10; /* Added z-index to ensure it's clickable */
 }
 
 .filter-button::before {

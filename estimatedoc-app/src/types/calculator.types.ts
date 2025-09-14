@@ -75,6 +75,7 @@ export interface ConfidenceSettings {
 }
 
 export interface CalculatorSettings {
+  baseTemplateTime?: number; // Base time per template in minutes
   fieldTimeEstimates: FieldTimeEstimates;
   complexityThresholds: ComplexityThresholds;
   complexityMultipliers: ComplexityMultipliers;

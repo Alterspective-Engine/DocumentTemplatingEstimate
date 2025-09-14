@@ -1,4 +1,4 @@
-import { ConsentState } from './types';
+import type { ConsentState } from './types';
 
 export class PrivacyManager {
   private static readonly CONSENT_KEY = 'analytics_consent';

@@ -1,4 +1,4 @@
-import { DeviceInfo } from '../types';
+import type { DeviceInfo } from '../types';
 
 export class DeviceCollector {
   public static async collect(): Promise<DeviceInfo> {

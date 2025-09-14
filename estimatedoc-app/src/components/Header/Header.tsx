@@ -1,16 +1,59 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { FileText, BarChart2, Calculator, Activity } from 'lucide-react';
+import { FileText, BarChart2, Calculator, Activity, RefreshCw, Database, Upload } from 'lucide-react';
 import { useDocumentStore } from '../../store/documentStore';
 import './Header.css';
 
 interface HeaderProps {
-  onCalculatorOpen: () => void;
+  // No props needed for now
 }
 
-export const Header: React.FC<HeaderProps> = ({ onCalculatorOpen }) => {
+export const Header: React.FC<HeaderProps> = () => {
   const location = useLocation();
-  const { documents } = useDocumentStore();
+  const { documents, dataSource, reloadDataFromSQL, isRecalculating } = useDocumentStore();
+  const [isReloading, setIsReloading] = useState(false);
+  const [isReprocessing, setIsReprocessing] = useState(false);
+
+  const handleReloadData = async () => {
+    setIsReloading(true);
+    await reloadDataFromSQL();
+    setIsReloading(false);
+  };
+
+  const handleReprocessData = async () => {
+    if (!confirm('This will reimport all data from newSQL and ImportantData folders.\nCalculator settings will be preserved.\nContinue?')) {
+      return;
+    }
+    
+    setIsReprocessing(true);
+    try {
+      // Call the reprocess API
+      const response = await fetch('/api/reprocess/import', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          preserveSettings: true
+        })
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        alert(`Data reprocessed successfully!\n\nImported:\n- ${result.stats.documents} documents\n- ${result.stats.fields} fields\n- ${result.stats.analyses} field analyses`);
+        // Reload the page to get fresh data
+        window.location.reload();
+      } else {
+        alert(`Reprocess failed: ${result.error}`);
+      }
+    } catch (error) {
+      console.error('Reprocess error:', error);
+      alert('Failed to reprocess data. Check console for details.');
+    } finally {
+      setIsReprocessing(false);
+    }
+  };
 
   return (
     <header className="app-header">
@@ -43,13 +86,13 @@ export const Header: React.FC<HeaderProps> = ({ onCalculatorOpen }) => {
             <BarChart2 size={20} />
             <span>Analytics</span>
           </Link>
-          <button 
-            className="nav-link calculator-btn"
-            onClick={onCalculatorOpen}
+          <Link 
+            to="/calculator" 
+            className={`nav-link ${location.pathname === '/calculator' ? 'active' : ''}`}
           >
             <Calculator size={20} />
             <span>Calculator</span>
-          </button>
+          </Link>
         </nav>
 
         <div className="header-stats">
@@ -61,11 +104,30 @@ export const Header: React.FC<HeaderProps> = ({ onCalculatorOpen }) => {
             </div>
           </div>
           <div className="stat-item">
-            <div className="confidence-indicator">
-              <span className="stat-value">99.6%</span>
-              <span className="stat-label">Data Confidence</span>
+            <Database size={16} />
+            <div className="stat-content">
+              <span className="stat-value">{dataSource}</span>
+              <span className="stat-label">Data Source</span>
             </div>
           </div>
+          <button
+            className={`reload-button ${isReloading || isRecalculating ? 'loading' : ''}`}
+            onClick={handleReloadData}
+            disabled={isReloading || isRecalculating || isReprocessing}
+            title="Reload data from current source"
+          >
+            <RefreshCw size={16} className={isReloading || isRecalculating ? 'spin' : ''} />
+            <span>Reload</span>
+          </button>
+          <button
+            className={`reprocess-button ${isReprocessing ? 'loading' : ''}`}
+            onClick={handleReprocessData}
+            disabled={isReloading || isRecalculating || isReprocessing}
+            title="Reprocess all data from newSQL and ImportantData folders"
+          >
+            <Upload size={16} className={isReprocessing ? 'spin' : ''} />
+            <span>Reprocess</span>
+          </button>
         </div>
       </div>
     </header>

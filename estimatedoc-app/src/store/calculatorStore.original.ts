@@ -193,11 +193,11 @@ export const useCalculatorStore = create<CalculatorStore>((set, get) => ({
     documents.forEach(doc => {
       // Calculate with original settings
       const originalDoc = get().recalculateDocument(doc, originalSettings);
-      totalHoursBefore += originalDoc.effort.optimized;
+      totalHoursBefore += originalDoc.effort?.optimized || 0;
       
       // Calculate with new settings  
       const newDoc = get().recalculateDocument(doc, settings);
-      totalHoursAfter += newDoc.effort.optimized;
+      totalHoursAfter += newDoc.effort?.optimized || 0;
     });
     
     const totalSavings = totalHoursBefore - totalHoursAfter;
@@ -221,21 +221,21 @@ export const useCalculatorStore = create<CalculatorStore>((set, get) => ({
     
     // Calculate total time based on field counts and current settings
     const fieldTime = 
-      document.fields.if.count * (settings.fieldTimeEstimates.ifStatement.current / 60) +
-      document.fields.precedentScript.count * (settings.fieldTimeEstimates.precedentScript.current / 60) +
-      document.fields.reflection.count * (settings.fieldTimeEstimates.reflection.current / 60) +
-      document.fields.search.count * (settings.fieldTimeEstimates.search.current / 60) +
-      document.fields.unbound.count * (settings.fieldTimeEstimates.unbound.current / 60) +
-      document.fields.builtInScript.count * (settings.fieldTimeEstimates.builtInScript.current / 60) +
-      document.fields.extended.count * (settings.fieldTimeEstimates.extended.current / 60) +
-      document.fields.scripted.count * (settings.fieldTimeEstimates.scripted.current / 60);
+      (typeof document.fields === 'object' && document.fields ? document.fields : {}).if.count * (settings.fieldTimeEstimates.ifStatement.current / 60) +
+      (typeof document.fields === 'object' && document.fields ? document.fields : {}).precedentScript.count * (settings.fieldTimeEstimates.precedentScript.current / 60) +
+      (typeof document.fields === 'object' && document.fields ? document.fields : {}).reflection.count * (settings.fieldTimeEstimates.reflection.current / 60) +
+      (typeof document.fields === 'object' && document.fields ? document.fields : {}).search.count * (settings.fieldTimeEstimates.search.current / 60) +
+      (typeof document.fields === 'object' && document.fields ? document.fields : {}).unbound.count * (settings.fieldTimeEstimates.unbound.current / 60) +
+      (typeof document.fields === 'object' && document.fields ? document.fields : {}).builtInScript.count * (settings.fieldTimeEstimates.builtInScript.current / 60) +
+      (typeof document.fields === 'object' && document.fields ? document.fields : {}).extended.count * (settings.fieldTimeEstimates.extended.current / 60) +
+      (typeof document.fields === 'object' && document.fields ? document.fields : {}).scripted.count * (settings.fieldTimeEstimates.scripted.current / 60);
     
     // Determine complexity based on current thresholds
-    const totalFields = document.totals.allFields;
-    const totalScripts = document.fields.precedentScript.count + 
-                        document.fields.builtInScript.count + 
-                        document.fields.scripted.count;
-    const ifStatements = document.fields.if.count;
+    const totalFields = (document.totals || 0).allFields;
+    const totalScripts = (typeof document.fields === 'object' && document.fields ? document.fields : {}).precedentScript.count + 
+                        (typeof document.fields === 'object' && document.fields ? document.fields : {}).builtInScript.count + 
+                        (typeof document.fields === 'object' && document.fields ? document.fields : {}).scripted.count;
+    const ifStatements = (typeof document.fields === 'object' && document.fields ? document.fields : {}).if.count;
     
     let complexity: 'Simple' | 'Moderate' | 'Complex';
     let complexityReason: string;
@@ -261,7 +261,7 @@ export const useCalculatorStore = create<CalculatorStore>((set, get) => ({
     const calculatedHours = fieldTime * multiplier;
     
     // Calculate optimization
-    const reuseRate = parseFloat(document.totals.reuseRate) / 100;
+    const reuseRate = parseFloat((document.totals || 0).reuseRate) / 100;
     const optimizationFactor = settings.optimization.reuseEfficiency.current / 100;
     const savings = calculatedHours * reuseRate * optimizationFactor;
     const optimizedHours = calculatedHours - savings;

@@ -1,150 +1,105 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { Clock, Target, TrendingUp, AlertCircle, Tag, Database, Hash } from 'lucide-react';
 import type { Document } from '../../types/document.types';
-import { FileText, Clock, Layers, TrendingUp, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
-import { useDocumentStore } from '../../store/documentStore';
-import { useHistoryStore } from '../../store/historyStore';
-import { MiniGraph } from '../MiniGraph/MiniGraph';
 import './DocumentCard.css';
 
 interface DocumentCardProps {
   document: Document;
-  onClick: (document: Document) => void;
+  onClick?: () => void;
   selected?: boolean;
 }
 
-export const DocumentCard: React.FC<DocumentCardProps> = ({ 
-  document, 
-  onClick, 
-  selected = false 
-}) => {
-  const { updatingDocuments } = useDocumentStore();
-  const { getDocumentHistory } = useHistoryStore();
-  const [isUpdating, setIsUpdating] = useState(false);
-  const [showChange, setShowChange] = useState(false);
-  
-  const history = getDocumentHistory(document.id.toString());
-  const effortHistory = history?.effort.map(h => h.value) || [];
-  const optimizedHistory = history?.optimized.map(h => h.value) || [];
-  const fieldsHistory = history?.fields.map(h => h.value) || [];
-  
-  // Check if this document is updating
-  useEffect(() => {
-    const updating = updatingDocuments.has(document.id.toString());
-    setIsUpdating(updating);
-    
-    if (updating) {
-      setShowChange(true);
-      const timer = setTimeout(() => setShowChange(false), 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [updatingDocuments, document.id]);
-  const getComplexityColor = (level: string) => {
-    switch (level) {
-      case 'Simple': return 'success';
-      case 'Moderate': return 'warning';
-      case 'Complex': return 'error';
-      default: return 'primary';
+export const DocumentCard: React.FC<DocumentCardProps> = ({ document, onClick, selected }) => {
+  const getComplexityColor = (complexity?: string | object) => {
+    const complexityStr = typeof complexity === 'object' && complexity !== null 
+      ? (complexity as any).level || 'simple'
+      : (complexity as string) || 'simple';
+    switch (complexityStr.toLowerCase()) {
+      case 'simple': return '#2C8248';
+      case 'moderate': return '#FFA500';
+      case 'complex': return '#FF6B6B';
+      default: return '#999';
     }
   };
 
-  const formatHours = (hours: number) => {
-    if (hours < 1) return `${Math.round(hours * 60)}m`;
-    return `${hours.toFixed(1)}h`;
+  const getRiskColor = (risk?: string) => {
+    switch (risk) {
+      case 'low': return '#2C8248';
+      case 'medium': return '#FFA500';
+      case 'high': return '#FF6B6B';
+      default: return '#999';
+    }
   };
+
+  const effort = document.effort?.calculated || 0;
+  const fields = document.totals?.allFields || document.fields || 0;
+  const reusability = document.reusability || 0;
+  const automationPotential = document.automationPotential || 0;
 
   return (
-    <div 
-      className={`document-card ${selected ? 'selected' : ''} ${isUpdating ? 'updating' : ''}`}
-      onClick={() => onClick(document)}
-    >
-      {isUpdating && (
-        <div className="update-indicator">
-          <RefreshCw size={14} className="spin" />
-          <span>Updating...</span>
-        </div>
-      )}
+    <div className={`document-card ${selected ? 'selected' : ''}`} onClick={onClick}>
       <div className="card-header">
-        <div className="card-title-group">
-          <FileText size={20} className="card-icon" />
-          <h3 className="title-medium">{document.name}</h3>
-        </div>
-        <span className={`complexity-badge badge-${getComplexityColor(document.complexity.level)}`}>
-          {document.complexity.level}
+        <h3>{document.name}</h3>
+        <span 
+          className="complexity-badge" 
+          style={{ backgroundColor: getComplexityColor(document.complexity) }}
+        >
+          {typeof document.complexity === 'object' && document.complexity !== null 
+            ? (document.complexity as any).level || 'Unknown'
+            : document.complexity || 'Unknown'}
         </span>
       </div>
       
-      <p className="card-description body-medium">
-        {document.description}
-      </p>
+      {document.description && (
+        <p className="description">{document.description}</p>
+      )}
       
-      <div className="card-metrics">
-        <div className={`metric ${showChange ? 'value-changed' : ''}`}>
-          <Layers size={16} className="metric-icon" />
-          <div className="metric-content">
-            <span className="label-small">Fields</span>
-            <div className="metric-value-with-graph">
-              <span className="body-large">{document.totals.allFields}</span>
-              {fieldsHistory.length > 1 && (
-                <MiniGraph 
-                  data={fieldsHistory} 
-                  width={40} 
-                  height={16}
-                  color="#B8B8B8"
-                  showTrend={false}
-                />
-              )}
-            </div>
-          </div>
-        </div>
-        
-        <div className={`metric ${showChange ? 'value-changed' : ''}`}>
-          <Clock size={16} className="metric-icon" />
-          <div className="metric-content">
-            <span className="label-small">Effort</span>
-            <div className="metric-value-with-graph">
-              <span className="body-large">{formatHours(document.effort.calculated)}</span>
-              {effortHistory.length > 1 && (
-                <MiniGraph 
-                  data={effortHistory} 
-                  width={40} 
-                  height={16}
-                  color="#FFD93D"
-                  showTrend={false}
-                />
-              )}
-            </div>
-          </div>
-        </div>
-        
+      <div className="metrics">
         <div className="metric">
-          <TrendingUp size={16} className="metric-icon" />
-          <div className="metric-content">
-            <span className="label-small">Reuse</span>
-            <span className="body-large">{document.totals.reuseRate}</span>
-          </div>
+          <Clock size={16} />
+          <span>Effort: {effort.toFixed(1)}h</span>
         </div>
-      </div>
-      
-      <div className="card-footer">
-        <div className="evidence-indicator">
-          {document.evidence.source === 'SQL' ? (
-            <div className="evidence-badge evidence-sql">
-              <CheckCircle size={14} />
-              <span className="label-small">SQL Data</span>
-            </div>
-          ) : (
-            <div className="evidence-badge evidence-estimated">
-              <AlertCircle size={14} />
-              <span className="label-small">Estimated</span>
-            </div>
-          )}
+        <div className="metric">
+          <Hash size={16} />
+          <span>Fields: {fields}</span>
         </div>
-        
-        {document.effort.savings > 0 && (
-          <div className="savings-indicator">
-            <span className="label-small">Save {formatHours(document.effort.savings)}</span>
+        {reusability > 0 && (
+          <div className="metric">
+            <Target size={16} />
+            <span>Reuse: {reusability}%</span>
           </div>
         )}
+        {automationPotential > 0 && (
+          <div className="metric">
+            <TrendingUp size={16} />
+            <span>Auto: {automationPotential}%</span>
+          </div>
+        )}
+        {document.implementationRisk && (
+          <div className="metric">
+            <AlertCircle size={16} color={getRiskColor(document.implementationRisk)} />
+            <span>Risk: {document.implementationRisk}</span>
+          </div>
+        )}
+      </div>
+      
+      {document.tags && document.tags.length > 0 && (
+        <div className="tags">
+          {document.tags.map((tag, index) => (
+            <span key={index} className="tag">
+              <Tag size={12} />
+              {tag}
+            </span>
+          ))}
+        </div>
+      )}
+      
+      <div className="card-footer">
+        <span className="category">{document.category || 'Uncategorized'}</span>
+        <span className={`data-source ${document.evidence?.source?.toLowerCase()}`}>
+          <Database size={12} />
+          {document.evidence?.source || 'Unknown'}
+        </span>
       </div>
     </div>
   );

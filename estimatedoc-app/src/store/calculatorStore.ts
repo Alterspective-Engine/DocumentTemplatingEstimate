@@ -140,15 +140,16 @@ interface CalculatorStore {
 }
 
 const defaultSettings: CalculatorSettings = {
+  baseTemplateTime: 0, // Start at 0 - all time should come from actual field calculations
   fieldTimeEstimates: {
-    ifStatement: { min: 5, default: 15, max: 60, current: 15, unit: 'minutes' },
-    precedentScript: { min: 10, default: 30, max: 120, current: 30, unit: 'minutes' },
-    reflection: { min: 2, default: 5, max: 30, current: 5, unit: 'minutes' },
-    search: { min: 5, default: 10, max: 45, current: 10, unit: 'minutes' },
-    unbound: { min: 2, default: 5, max: 20, current: 5, unit: 'minutes' },
-    builtInScript: { min: 5, default: 15, max: 60, current: 15, unit: 'minutes' },
-    extended: { min: 5, default: 10, max: 40, current: 10, unit: 'minutes' },
-    scripted: { min: 10, default: 20, max: 90, current: 20, unit: 'minutes' }
+    ifStatement: { min: 0, default: 15, max: 60, current: 15, unit: 'minutes' },
+    precedentScript: { min: 0, default: 30, max: 120, current: 30, unit: 'minutes' },
+    reflection: { min: 0, default: 5, max: 30, current: 5, unit: 'minutes' },
+    search: { min: 0, default: 10, max: 45, current: 10, unit: 'minutes' },
+    unbound: { min: 0, default: 5, max: 20, current: 5, unit: 'minutes' },
+    builtInScript: { min: 0, default: 15, max: 60, current: 15, unit: 'minutes' },
+    extended: { min: 0, default: 10, max: 40, current: 10, unit: 'minutes' },
+    scripted: { min: 0, default: 20, max: 90, current: 20, unit: 'minutes' }
   },
   complexityThresholds: {
     simple: {
@@ -164,9 +165,9 @@ const defaultSettings: CalculatorSettings = {
     }
   },
   complexityMultipliers: {
-    simple: { min: 0.5, default: 1.0, max: 1.5, current: 1.0 },
-    moderate: { min: 1.0, default: 1.5, max: 2.5, current: 1.5 },
-    complex: { min: 2.0, default: 2.5, max: 5.0, current: 2.5 }
+    simple: { min: 0, default: 1.0, max: 2.0, current: 1.0 },
+    moderate: { min: 0, default: 1.5, max: 3.0, current: 1.5 },
+    complex: { min: 0, default: 2.5, max: 5.0, current: 2.5 }
   },
   optimization: {
     reuseEfficiency: { min: 0, default: 40, max: 80, current: 40, unit: '%' },
@@ -476,16 +477,16 @@ export const useCalculatorStore = create<CalculatorStore>()(
           chunk.forEach(doc => {
             // Calculate with original settings
             const originalDoc = get().recalculateDocumentOptimized(doc, originalSettings);
-            totalHoursBefore += originalDoc.effort.optimized;
+            totalHoursBefore += originalDoc.effort?.optimized || 0;
             
             // Calculate with new settings  
             const newDoc = get().recalculateDocumentOptimized(doc, settings);
-            totalHoursAfter += newDoc.effort.optimized;
+            totalHoursAfter += newDoc.effort?.optimized || 0;
             
             // Track complexity breakdown
-            const complexity = newDoc.complexity.level.toLowerCase() as 'simple' | 'moderate' | 'complex';
+            const complexity = ((newDoc.complexity as any)?.level || newDoc.complexity || 'simple').toLowerCase() as 'simple' | 'moderate' | 'complex';
             complexityBreakdown[complexity].count++;
-            complexityBreakdown[complexity].hours += newDoc.effort.optimized;
+            complexityBreakdown[complexity].hours += newDoc.effort?.optimized || 0;
           });
           
           set({ calculationProgress: Math.round((i + chunkSize) / sampledDocs.length * 100) });
@@ -543,7 +544,7 @@ export const useCalculatorStore = create<CalculatorStore>()(
         
         // Store in cache (limit cache size)
         if (calculationCache.size > 1000) {
-          const firstKey = calculationCache.keys().next().value;
+          const firstKey = calculationCache.keys().next().value!;
           calculationCache.delete(firstKey);
         }
         calculationCache.set(cacheKey, result);
@@ -554,23 +555,66 @@ export const useCalculatorStore = create<CalculatorStore>()(
       recalculateDocument: (document, customSettings = null) => {
         const settings = customSettings || get().settings;
         
-        // Calculate total time based on field counts and current settings
+        // Handle both database format (fieldTypes) and legacy format (fields)
+        const getFieldCount = (fieldName: string): number => {
+          // Database format: document.fieldTypes.ifStatement
+          if (document.fieldTypes) {
+            const mapping: Record<string, string> = {
+              'if': 'ifStatement',
+              'precedentScript': 'precedentScript',
+              'reflection': 'reflection',
+              'search': 'search',
+              'unbound': 'unbound',
+              'builtInScript': 'builtInScript',
+              'extended': 'extended',
+              'scripted': 'scripted'
+            };
+            return document.fieldTypes[mapping[fieldName] as keyof typeof document.fieldTypes] || 0;
+          }
+          // Legacy format: (document.fields || 0).if.count
+          if ((document.fields || 0) && typeof (document.fields || 0) === 'object' && 'if' in (document.fields || 0)) {
+            return ((document.fields || 0) as any)[fieldName]?.count || 0;
+          }
+          return 0;
+        };
+        
+        // Start with base template time (converted to hours)
+        // FIXED: Respect zero value - no default fallback
+        const baseTemplateHours = (settings.baseTemplateTime || 0) / 60;
+        
+        // Calculate additional time based on field counts and current settings
+        const precedentCount = getFieldCount('precedentScript');
+        const precedentMinutes = settings.fieldTimeEstimates.precedentScript.current;
+        
+        // Debug logging for test doc
+        if (document.name === 'test doc.docx') {
+          console.log('=== Calculating test doc.docx ===');
+          console.log('Precedent scripts:', precedentCount);
+          console.log('Minutes per script:', precedentMinutes);
+          console.log('Base template time:', settings.baseTemplateTime);
+        }
+        
         const fieldTime = 
-          document.fields.if.count * (settings.fieldTimeEstimates.ifStatement.current / 60) +
-          document.fields.precedentScript.count * (settings.fieldTimeEstimates.precedentScript.current / 60) +
-          document.fields.reflection.count * (settings.fieldTimeEstimates.reflection.current / 60) +
-          document.fields.search.count * (settings.fieldTimeEstimates.search.current / 60) +
-          document.fields.unbound.count * (settings.fieldTimeEstimates.unbound.current / 60) +
-          document.fields.builtInScript.count * (settings.fieldTimeEstimates.builtInScript.current / 60) +
-          document.fields.extended.count * (settings.fieldTimeEstimates.extended.current / 60) +
-          document.fields.scripted.count * (settings.fieldTimeEstimates.scripted.current / 60);
+          getFieldCount('if') * (settings.fieldTimeEstimates.ifStatement.current / 60) +
+          precedentCount * (precedentMinutes / 60) +
+          getFieldCount('reflection') * (settings.fieldTimeEstimates.reflection.current / 60) +
+          getFieldCount('search') * (settings.fieldTimeEstimates.search.current / 60) +
+          getFieldCount('unbound') * (settings.fieldTimeEstimates.unbound.current / 60) +
+          getFieldCount('builtInScript') * (settings.fieldTimeEstimates.builtInScript.current / 60) +
+          getFieldCount('extended') * (settings.fieldTimeEstimates.extended.current / 60) +
+          getFieldCount('scripted') * (settings.fieldTimeEstimates.scripted.current / 60);
+        
+        // Total base effort is base template time plus field-specific time
+        const totalBaseTime = baseTemplateHours + fieldTime;
         
         // Determine complexity
-        const totalFields = document.totals.allFields;
-        const totalScripts = document.fields.precedentScript.count + 
-                            document.fields.builtInScript.count + 
-                            document.fields.scripted.count;
-        const ifStatements = document.fields.if.count;
+        const totalFields = document.totals?.allFields || 
+                          (document.fieldTypes ? Object.values(document.fieldTypes).reduce((sum: number, val) => sum + (val as number), 0) : 0) ||
+                          (typeof (document.fields || 0) === 'number' ? (document.fields || 0) : 0);
+        const totalScripts = getFieldCount('precedentScript') + 
+                            getFieldCount('builtInScript') + 
+                            getFieldCount('scripted');
+        const ifStatements = getFieldCount('if');
         
         let complexity: 'Simple' | 'Moderate' | 'Complex';
         let complexityReason: string;
@@ -591,12 +635,22 @@ export const useCalculatorStore = create<CalculatorStore>()(
           complexityReason = `Exceeds moderate thresholds`;
         }
         
-        // Apply complexity multiplier
-        const multiplier = settings.complexityMultipliers[complexity.toLowerCase() as 'simple' | 'moderate' | 'complex'].current;
-        const calculatedHours = fieldTime * multiplier;
+        // Apply complexity multiplier - ensure valid values
+        const multiplier = settings.complexityMultipliers[complexity.toLowerCase() as 'simple' | 'moderate' | 'complex'].current || 1;
+        const calculatedHours = (totalBaseTime || 0) * multiplier;
+        
+        // More debug for test doc
+        if (document.name === 'test doc.docx') {
+          console.log('Field time (hours):', fieldTime);
+          console.log('Total base time:', totalBaseTime);
+          console.log('Complexity:', complexity);
+          console.log('Multiplier:', multiplier);
+          console.log('Calculated hours:', calculatedHours);
+        }
         
         // Calculate optimization with all three factors
-        const reuseRate = parseFloat(document.totals.reuseRate) / 100;
+        // Use actual reusability from document (calculated from field types) or 0
+        const reuseRate = (document.reusability || 0) / 100;
         const reuseEfficiency = settings.optimization.reuseEfficiency.current / 100;
         const learningFactor = settings.optimization.learningCurve.current / 100;
         const automationFactor = settings.optimization.automationPotential.current / 100;
@@ -613,23 +667,34 @@ export const useCalculatorStore = create<CalculatorStore>()(
         
         const optimizedHours = Math.max(calculatedHours - totalSavings, calculatedHours * 0.2); // Minimum 20% of original
         
+        // Calculate totals for the document - ensure no NaN or undefined values
+        const allFields = totalFields || 0;
+        
         // Return updated document
         return {
           ...document,
+          // Only use actual totals from SQL data - no fabrication
+          totals: document.totals || {
+            allFields
+          },
           complexity: {
             level: complexity,
             reason: complexityReason,
             calculation: {
-              formula: "Field_Time × Complexity_Multiplier",
+              formula: "(Base_Template_Time + Field_Time) × Complexity_Multiplier",
               inputs: {
+                baseTemplateHours,
                 fieldTime,
+                totalBaseTime,
                 multiplier
               },
               steps: [
-                { label: "Field Time", value: fieldTime },
+                { label: "Base Template Time", value: `${baseTemplateHours.toFixed(2)}h` },
+                { label: "Field Time", value: `${fieldTime.toFixed(2)}h` },
+                { label: "Total Base Time", value: `${totalBaseTime.toFixed(2)}h` },
                 { label: "Complexity", value: complexity },
                 { label: "Multiplier", value: multiplier },
-                { label: "Final Hours", value: calculatedHours }
+                { label: "Final Hours", value: `${calculatedHours.toFixed(2)}h` }
               ],
               result: calculatedHours
             }
@@ -648,12 +713,12 @@ export const useCalculatorStore = create<CalculatorStore>()(
                 automationFactor
               },
               steps: [
-                { label: "Base Hours", value: calculatedHours },
+                { label: "Base Hours", value: calculatedHours.toFixed(2) },
                 { label: "Reuse Savings", value: reuseSavings.toFixed(1) },
                 { label: "Learning Savings", value: learningSavings.toFixed(1) },
                 { label: "Automation Savings", value: automationSavings.toFixed(1) },
                 { label: "Total Savings", value: totalSavings.toFixed(1) },
-                { label: "Optimized", value: optimizedHours }
+                { label: "Optimized", value: optimizedHours.toFixed(2) }
               ],
               result: optimizedHours
             }
@@ -666,7 +731,37 @@ export const useCalculatorStore = create<CalculatorStore>()(
       partialize: (state) => ({ 
         settings: state.settings,
         history: state.history.slice(-10) // Keep only last 10 for storage
-      })
+      }),
+      merge: (persisted: any, current) => {
+        // Ensure all field estimates have min, max, default properties
+        const mergedSettings = persisted?.settings || current.settings;
+        
+        // Deep merge fieldTimeEstimates to ensure all properties exist
+        if (mergedSettings?.fieldTimeEstimates) {
+          Object.keys(defaultSettings.fieldTimeEstimates).forEach(field => {
+            const fieldKey = field as keyof typeof defaultSettings.fieldTimeEstimates;
+            if (mergedSettings.fieldTimeEstimates[fieldKey]) {
+              // Ensure min, max, default exist even if only current was saved
+              mergedSettings.fieldTimeEstimates[fieldKey] = {
+                ...defaultSettings.fieldTimeEstimates[fieldKey],
+                ...mergedSettings.fieldTimeEstimates[fieldKey],
+                min: mergedSettings.fieldTimeEstimates[fieldKey].min ?? defaultSettings.fieldTimeEstimates[fieldKey].min,
+                max: mergedSettings.fieldTimeEstimates[fieldKey].max ?? defaultSettings.fieldTimeEstimates[fieldKey].max,
+                default: mergedSettings.fieldTimeEstimates[fieldKey].default ?? defaultSettings.fieldTimeEstimates[fieldKey].default,
+                // Ensure current is valid, use default if not set
+                current: mergedSettings.fieldTimeEstimates[fieldKey].current ?? defaultSettings.fieldTimeEstimates[fieldKey].current
+              };
+            }
+          });
+        }
+        
+        return {
+          ...current,
+          ...persisted,
+          settings: mergedSettings,
+          calculationCache: new Map() // Always start with fresh cache
+        };
+      }
     }
   )
 );

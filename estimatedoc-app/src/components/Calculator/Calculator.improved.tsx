@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useCalculatorStore, CALCULATOR_PRESETS } from '../../store/calculatorStore.improved';
 import { useDebounce } from '../../hooks/useDebounce';
 import { useAnalytics } from '../../hooks/useAnalytics';

@@ -476,16 +476,16 @@ export const useCalculatorStore = create<CalculatorStore>()(
           chunk.forEach(doc => {
             // Calculate with original settings
             const originalDoc = get().recalculateDocumentOptimized(doc, originalSettings);
-            totalHoursBefore += originalDoc.effort.optimized;
+            totalHoursBefore += originalDoc.effort?.optimized || 0;
             
             // Calculate with new settings  
             const newDoc = get().recalculateDocumentOptimized(doc, settings);
-            totalHoursAfter += newDoc.effort.optimized;
+            totalHoursAfter += newDoc.effort?.optimized || 0;
             
             // Track complexity breakdown
             const complexity = newDoc.complexity.level.toLowerCase() as 'simple' | 'moderate' | 'complex';
             complexityBreakdown[complexity].count++;
-            complexityBreakdown[complexity].hours += newDoc.effort.optimized;
+            complexityBreakdown[complexity].hours += newDoc.effort?.optimized || 0;
           });
           
           set({ calculationProgress: Math.round((i + chunkSize) / sampledDocs.length * 100) });
@@ -543,7 +543,7 @@ export const useCalculatorStore = create<CalculatorStore>()(
         
         // Store in cache (limit cache size)
         if (calculationCache.size > 1000) {
-          const firstKey = calculationCache.keys().next().value;
+          const firstKey = calculationCache.keys().next().value!;
           calculationCache.delete(firstKey);
         }
         calculationCache.set(cacheKey, result);
@@ -556,21 +556,21 @@ export const useCalculatorStore = create<CalculatorStore>()(
         
         // Calculate total time based on field counts and current settings
         const fieldTime = 
-          document.fields.if.count * (settings.fieldTimeEstimates.ifStatement.current / 60) +
-          document.fields.precedentScript.count * (settings.fieldTimeEstimates.precedentScript.current / 60) +
-          document.fields.reflection.count * (settings.fieldTimeEstimates.reflection.current / 60) +
-          document.fields.search.count * (settings.fieldTimeEstimates.search.current / 60) +
-          document.fields.unbound.count * (settings.fieldTimeEstimates.unbound.current / 60) +
-          document.fields.builtInScript.count * (settings.fieldTimeEstimates.builtInScript.current / 60) +
-          document.fields.extended.count * (settings.fieldTimeEstimates.extended.current / 60) +
-          document.fields.scripted.count * (settings.fieldTimeEstimates.scripted.current / 60);
+          (typeof document.fields === 'object' && document.fields ? document.fields : {}).if.count * (settings.fieldTimeEstimates.ifStatement.current / 60) +
+          (typeof document.fields === 'object' && document.fields ? document.fields : {}).precedentScript.count * (settings.fieldTimeEstimates.precedentScript.current / 60) +
+          (typeof document.fields === 'object' && document.fields ? document.fields : {}).reflection.count * (settings.fieldTimeEstimates.reflection.current / 60) +
+          (typeof document.fields === 'object' && document.fields ? document.fields : {}).search.count * (settings.fieldTimeEstimates.search.current / 60) +
+          (typeof document.fields === 'object' && document.fields ? document.fields : {}).unbound.count * (settings.fieldTimeEstimates.unbound.current / 60) +
+          (typeof document.fields === 'object' && document.fields ? document.fields : {}).builtInScript.count * (settings.fieldTimeEstimates.builtInScript.current / 60) +
+          (typeof document.fields === 'object' && document.fields ? document.fields : {}).extended.count * (settings.fieldTimeEstimates.extended.current / 60) +
+          (typeof document.fields === 'object' && document.fields ? document.fields : {}).scripted.count * (settings.fieldTimeEstimates.scripted.current / 60);
         
         // Determine complexity
-        const totalFields = document.totals.allFields;
-        const totalScripts = document.fields.precedentScript.count + 
-                            document.fields.builtInScript.count + 
-                            document.fields.scripted.count;
-        const ifStatements = document.fields.if.count;
+        const totalFields = (document.totals || 0).allFields;
+        const totalScripts = (typeof document.fields === 'object' && document.fields ? document.fields : {}).precedentScript.count + 
+                            (typeof document.fields === 'object' && document.fields ? document.fields : {}).builtInScript.count + 
+                            (typeof document.fields === 'object' && document.fields ? document.fields : {}).scripted.count;
+        const ifStatements = (typeof document.fields === 'object' && document.fields ? document.fields : {}).if.count;
         
         let complexity: 'Simple' | 'Moderate' | 'Complex';
         let complexityReason: string;
@@ -596,7 +596,7 @@ export const useCalculatorStore = create<CalculatorStore>()(
         const calculatedHours = fieldTime * multiplier;
         
         // Calculate optimization with all three factors
-        const reuseRate = parseFloat(document.totals.reuseRate) / 100;
+        const reuseRate = parseFloat((document.totals || 0).reuseRate) / 100;
         const reuseEfficiency = settings.optimization.reuseEfficiency.current / 100;
         const learningFactor = settings.optimization.learningCurve.current / 100;
         const automationFactor = settings.optimization.automationPotential.current / 100;

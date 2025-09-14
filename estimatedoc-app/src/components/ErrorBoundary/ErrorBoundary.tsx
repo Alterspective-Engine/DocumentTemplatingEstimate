@@ -1,4 +1,5 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+import React, { Component } from 'react';
+import type { ErrorInfo, ReactNode } from 'react';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 import './ErrorBoundary.css';
 
@@ -38,8 +39,8 @@ export class ErrorBoundary extends Component<Props, State> {
     console.error('Error Boundary caught an error:', error, errorInfo);
     
     // Track error in analytics if available
-    if (window.analytics?.trackError) {
-      window.analytics.trackError({
+    if ((window as any).analytics?.trackError) {
+      (window as any).analytics.trackError({
         message: error.message,
         stack: error.stack,
         componentStack: errorInfo.componentStack
@@ -54,7 +55,7 @@ export class ErrorBoundary extends Component<Props, State> {
     }));
     
     // Report to error tracking service in production
-    if (process.env.NODE_ENV === 'production') {
+    if (import.meta.env.PROD) {
       this.reportErrorToService(error, errorInfo);
     }
   }
@@ -120,7 +121,7 @@ export class ErrorBoundary extends Component<Props, State> {
               We encountered an unexpected error. The issue has been logged and we'll look into it.
             </p>
 
-            {process.env.NODE_ENV === 'development' && this.state.error && (
+            {import.meta.env.DEV && this.state.error && (
               <details className="error-details">
                 <summary className="label-medium">Error Details (Development Only)</summary>
                 <div className="error-stack">

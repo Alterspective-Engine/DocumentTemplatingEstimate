@@ -1,4 +1,4 @@
-import { AnalyticsEvent, VisitorSession } from '../types';
+import type { AnalyticsEvent } from '../types';
 
 export class StorageAdapter {
   private storageType: 'indexeddb' | 'localStorage' | 'memory';
@@ -20,7 +20,7 @@ export class StorageAdapter {
   }
 
   private async initIndexedDB(): Promise<void> {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       try {
         const request = indexedDB.open(this.DB_NAME, this.DB_VERSION);
 
@@ -86,7 +86,7 @@ export class StorageAdapter {
   }
 
   private async setIndexedDB(key: string, value: any): Promise<void> {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       if (!this.db) {
         this.setLocalStorage(key, value);
         resolve();

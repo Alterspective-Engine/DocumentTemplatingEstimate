@@ -1,17 +1,19 @@
 {
   "name": "estimatedoc-app",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.4.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "node scripts/update-version.js && vite build",
+    "build:check": "node scripts/update-version.js && tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
     "@tanstack/react-table": "^8.21.3",
     "@tanstack/react-virtual": "^3.13.12",
+    "@types/better-sqlite3": "^7.6.13",
     "better-sqlite3": "^12.2.0",
     "clsx": "^2.1.1",
     "cors": "^2.8.5",

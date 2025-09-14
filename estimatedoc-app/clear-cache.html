@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Clear EstimateDoc Cache</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #075156;
+            margin-bottom: 20px;
+        }
+        button {
+            background: #075156;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #2C8248;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #28a745;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+            display: none;
+        }
+        .cache-items {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .cache-item {
+            margin: 5px 0;
+            padding: 5px;
+            background: white;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧹 EstimateDoc Cache Manager</h1>
+        
+        <div class="warning">
+            ⚠️ <strong>Warning:</strong> Clearing cache will reset all your custom settings, calculator configurations, and history data.
+        </div>
+
+        <h2>Currently Cached Data:</h2>
+        <div id="cacheItems" class="cache-items">
+            Loading...
+        </div>
+
+        <h2>Actions:</h2>
+        <button onclick="clearCalculatorCache()">Clear Calculator Settings</button>
+        <button onclick="clearHistoryCache()">Clear History Data</button>
+        <button onclick="clearAnalyticsCache()">Clear Analytics</button>
+        <button onclick="clearAllCache()">Clear ALL Cache</button>
+        <button onclick="showCache()">Refresh View</button>
+
+        <div id="success" class="success">
+            ✅ Cache cleared successfully! Refresh the EstimateDoc app to see changes.
+        </div>
+    </div>
+
+    <script>
+        function showCache() {
+            const items = document.getElementById('cacheItems');
+            items.innerHTML = '';
+            
+            let found = false;
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key) {
+                    found = true;
+                    const value = localStorage.getItem(key);
+                    const size = new Blob([value]).size;
+                    items.innerHTML += `
+                        <div class="cache-item">
+                            <strong>${key}</strong> (${(size / 1024).toFixed(2)} KB)
+                        </div>
+                    `;
+                }
+            }
+            
+            if (!found) {
+                items.innerHTML = '<div class="cache-item">No cached data found</div>';
+            }
+        }
+
+        function clearCalculatorCache() {
+            localStorage.removeItem('estimatedoc-calculator');
+            showSuccess();
+            showCache();
+        }
+
+        function clearHistoryCache() {
+            localStorage.removeItem('estimatedoc-history');
+            showSuccess();
+            showCache();
+        }
+
+        function clearAnalyticsCache() {
+            const keys = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.startsWith('analytics')) {
+                    keys.push(key);
+                }
+            }
+            keys.forEach(key => localStorage.removeItem(key));
+            showSuccess();
+            showCache();
+        }
+
+        function clearAllCache() {
+            if (confirm('Are you sure you want to clear ALL cached data? This action cannot be undone.')) {
+                localStorage.clear();
+                sessionStorage.clear();
+                
+                // Clear IndexedDB if it exists
+                if (window.indexedDB) {
+                    indexedDB.deleteDatabase('AnalyticsDB');
+                }
+                
+                showSuccess();
+                showCache();
+            }
+        }
+
+        function showSuccess() {
+            const success = document.getElementById('success');
+            success.style.display = 'block';
+            setTimeout(() => {
+                success.style.display = 'none';
+            }, 5000);
+        }
+
+        // Show cache on load
+        showCache();
+    </script>
+</body>
+</html>

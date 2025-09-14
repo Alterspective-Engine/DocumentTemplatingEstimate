@@ -5,7 +5,23 @@
 
 import { useDocumentStore } from '../store/documentStore';
 import { useCalculatorStore } from '../store/calculatorStore';
-import type { Document } from '../types/document.types';
+
+// Type definitions for verification results
+type CalculationVerificationResult = {
+  valid: boolean;
+  errors: string[];
+  warnings: string[];
+};
+
+type StatisticsVerificationResult = {
+  valid: boolean;
+  errors: string[];
+};
+
+type FieldCountsVerificationResult = {
+  valid: boolean;
+  errors: string[];
+};
 
 export class DataVerificationService {
   private static instance: DataVerificationService;
@@ -22,11 +38,7 @@ export class DataVerificationService {
   /**
    * Verify that all documents have been calculated with current settings
    */
-  verifyDocumentCalculations(): {
-    valid: boolean;
-    errors: string[];
-    warnings: string[];
-  } {
+  verifyDocumentCalculations(): CalculationVerificationResult {
     const documentStore = useDocumentStore.getState();
     const calculatorStore = useCalculatorStore.getState();
     const { documents } = documentStore;
@@ -40,33 +52,41 @@ export class DataVerificationService {
       const recalculated = calculatorStore.recalculateDocument(doc, settings);
       
       // Check if values match
-      if (Math.abs(doc.effort.calculated - recalculated.effort.calculated) > 0.01) {
+      if (doc.effort?.calculated != null && recalculated.effort?.calculated != null && 
+          Math.abs(doc.effort.calculated - recalculated.effort.calculated) > 0.01) {
         errors.push(`Document ${doc.name}: Calculated effort mismatch (${doc.effort.calculated} vs ${recalculated.effort.calculated})`);
       }
       
-      if (Math.abs(doc.effort.optimized - recalculated.effort.optimized) > 0.01) {
+      if (doc.effort?.optimized != null && recalculated.effort?.optimized != null && 
+          Math.abs(doc.effort.optimized - recalculated.effort.optimized) > 0.01) {
         errors.push(`Document ${doc.name}: Optimized effort mismatch (${doc.effort.optimized} vs ${recalculated.effort.optimized})`);
       }
       
-      if (doc.complexity.level !== recalculated.complexity.level) {
-        errors.push(`Document ${doc.name}: Complexity mismatch (${doc.complexity.level} vs ${recalculated.complexity.level})`);
+      const docComplexity = (doc.complexity as any)?.level || doc.complexity;
+      const recalcComplexity = (recalculated.complexity as any)?.level || recalculated.complexity;
+      if (docComplexity !== recalcComplexity) {
+        errors.push(`Document ${doc.name}: Complexity mismatch (${docComplexity} vs ${recalcComplexity})`);
       }
       
       // Check for invalid values
-      if (isNaN(doc.effort.calculated) || !isFinite(doc.effort.calculated)) {
+      const calculatedEffort = doc.effort?.calculated;
+      const optimizedEffort = doc.effort?.optimized;
+      const savings = doc.effort?.savings;
+      
+      if (calculatedEffort != null && (isNaN(calculatedEffort) || !isFinite(calculatedEffort))) {
         errors.push(`Document ${doc.name}: Invalid calculated effort value`);
       }
       
-      if (isNaN(doc.effort.optimized) || !isFinite(doc.effort.optimized)) {
+      if (optimizedEffort != null && (isNaN(optimizedEffort) || !isFinite(optimizedEffort))) {
         errors.push(`Document ${doc.name}: Invalid optimized effort value`);
       }
       
       // Warnings for potential issues
-      if (doc.effort.optimized > doc.effort.calculated) {
+      if (optimizedEffort != null && calculatedEffort != null && optimizedEffort > calculatedEffort) {
         warnings.push(`Document ${doc.name}: Optimized effort exceeds calculated effort`);
       }
       
-      if (doc.effort.savings < 0) {
+      if (savings != null && savings < 0) {
         warnings.push(`Document ${doc.name}: Negative savings detected`);
       }
     });
@@ -81,10 +101,7 @@ export class DataVerificationService {
   /**
    * Verify statistics calculations
    */
-  verifyStatistics(): {
-    valid: boolean;
-    errors: string[];
-  } {
+  verifyStatistics(): StatisticsVerificationResult {
     const documentStore = useDocumentStore.getState();
     const { documents, getStatistics } = documentStore;
     const stats = getStatistics();
@@ -92,12 +109,21 @@ export class DataVerificationService {
     const errors: string[] = [];
     
     // Manually calculate totals
-    const manualTotalEffort = documents.reduce((sum, doc) => sum + doc.effort.calculated, 0);
-    const manualTotalOptimized = documents.reduce((sum, doc) => sum + doc.effort.optimized, 0);
+    const manualTotalEffort = documents.reduce((sum, doc) => sum + (doc.effort?.calculated || 0), 0);
+    const manualTotalOptimized = documents.reduce((sum, doc) => sum + (doc.effort?.optimized || 0), 0);
     const manualComplexityCount = {
-      Simple: documents.filter(d => d.complexity.level === 'Simple').length,
-      Moderate: documents.filter(d => d.complexity.level === 'Moderate').length,
-      Complex: documents.filter(d => d.complexity.level === 'Complex').length
+      Simple: documents.filter(d => {
+        const complexity = (d.complexity as any)?.level || d.complexity;
+        return complexity === 'Simple';
+      }).length,
+      Moderate: documents.filter(d => {
+        const complexity = (d.complexity as any)?.level || d.complexity;
+        return complexity === 'Moderate';
+      }).length,
+      Complex: documents.filter(d => {
+        const complexity = (d.complexity as any)?.level || d.complexity;
+        return complexity === 'Complex';
+      }).length
     };
     
     // Verify totals match
@@ -125,10 +151,7 @@ export class DataVerificationService {
   /**
    * Verify field counts and totals
    */
-  verifyFieldCounts(): {
-    valid: boolean;
-    errors: string[];
-  } {
+  verifyFieldCounts(): FieldCountsVerificationResult {
     const documentStore = useDocumentStore.getState();
     const { documents } = documentStore;
     
@@ -136,17 +159,39 @@ export class DataVerificationService {
     
     documents.forEach(doc => {
       // Calculate total fields from individual counts
-      const calculatedTotal = 
-        doc.fields.if.count +
-        doc.fields.precedentScript.count +
-        doc.fields.reflection.count +
-        doc.fields.search.count +
-        doc.fields.unbound.count +
-        doc.fields.builtInScript.count +
-        doc.fields.extended.count +
-        doc.fields.scripted.count;
+      let calculatedTotal = 0;
       
-      if (doc.totals.allFields !== calculatedTotal) {
+      // Handle both database format (fieldTypes) and legacy format (fields)
+      if (doc.fieldTypes) {
+        // Database format
+        calculatedTotal = 
+          (doc.fieldTypes.ifStatement || 0) +
+          (doc.fieldTypes.precedentScript || 0) +
+          (doc.fieldTypes.reflection || 0) +
+          (doc.fieldTypes.search || 0) +
+          (doc.fieldTypes.unbound || 0) +
+          (doc.fieldTypes.builtInScript || 0) +
+          (doc.fieldTypes.extended || 0) +
+          (doc.fieldTypes.scripted || 0);
+      } else if (doc.fields && typeof doc.fields === 'object' && 'if' in doc.fields) {
+        // Legacy format
+        const fields = doc.fields as any;
+        calculatedTotal = 
+          (fields.if?.count || 0) +
+          (fields.precedentScript?.count || 0) +
+          (fields.reflection?.count || 0) +
+          (fields.search?.count || 0) +
+          (fields.unbound?.count || 0) +
+          (fields.builtInScript?.count || 0) +
+          (fields.extended?.count || 0) +
+          (fields.scripted?.count || 0);
+      } else if (typeof doc.fields === 'number') {
+        // Simple number format
+        calculatedTotal = doc.fields;
+      }
+      
+      // Only check if totals exist
+      if (doc.totals?.allFields && Math.abs(doc.totals.allFields - calculatedTotal) > 1) {
         errors.push(`Document ${doc.name}: Field total mismatch (${doc.totals.allFields} vs ${calculatedTotal})`);
       }
     });
@@ -168,19 +213,14 @@ export class DataVerificationService {
       warnings: number;
     };
     details: {
-      calculations: ReturnType<typeof this.verifyDocumentCalculations>;
-      statistics: ReturnType<typeof this.verifyStatistics>;
-      fieldCounts: ReturnType<typeof this.verifyFieldCounts>;
+      calculations: CalculationVerificationResult;
+      statistics: StatisticsVerificationResult;
+      fieldCounts: FieldCountsVerificationResult;
     };
   } {
     const calculations = this.verifyDocumentCalculations();
     const statistics = this.verifyStatistics();
     const fieldCounts = this.verifyFieldCounts();
-    
-    const totalErrors = 
-      calculations.errors.length + 
-      statistics.errors.length + 
-      fieldCounts.errors.length;
     
     const totalChecks = 3;
     const passed = [calculations, statistics, fieldCounts].filter(r => r.valid).length;

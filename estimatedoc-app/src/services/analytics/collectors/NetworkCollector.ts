@@ -1,4 +1,4 @@
-import { NetworkInfo } from '../types';
+import type { NetworkInfo } from '../types';
 
 export class NetworkCollector {
   public static async collect(): Promise<NetworkInfo> {

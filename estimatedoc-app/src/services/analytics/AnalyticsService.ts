@@ -1,4 +1,4 @@
-import { 
+import type { 
   AnalyticsEvent, 
   VisitorSession, 
   DeviceInfo, 
@@ -20,7 +20,7 @@ export class AnalyticsService {
   private config: AnalyticsConfig;
   private session: VisitorSession | null = null;
   private eventQueue: AnalyticsEvent[] = [];
-  private flushTimer: NodeJS.Timeout | null = null;
+  private flushTimer: ReturnType<typeof setTimeout> | null = null;
   private privacyManager: PrivacyManager;
   private storage: StorageAdapter;
   private deviceInfo: DeviceInfo | null = null;
@@ -54,6 +54,10 @@ export class AnalyticsService {
       AnalyticsService.instance = new AnalyticsService();
     }
     return AnalyticsService.instance;
+  }
+
+  public get initialized(): boolean {
+    return this.isInitialized;
   }
 
   public async initialize(config?: Partial<AnalyticsConfig>): Promise<void> {
@@ -132,7 +136,7 @@ export class AnalyticsService {
     
     if (storedSession && this.isSessionValid(storedSession)) {
       this.session = storedSession;
-      this.session.lastActivity = Date.now();
+      this.session!.lastActivity = Date.now();
     } else {
       // Create new session
       this.session = {
@@ -434,7 +438,7 @@ export class AnalyticsService {
     const action: UserAction = {
       type: 'calculator',
       target: 'calculator',
-      value: { settingsChanged: true },
+      value: { settingsChanged: true, settings },
       timestamp: Date.now()
     };
     
@@ -533,7 +537,7 @@ export class AnalyticsService {
     await this.storage.set('session', this.session);
 
     const action: UserAction = {
-      type: 'action',
+      type: 'click',
       target: 'user_login',
       value: { userId, properties },
       timestamp: Date.now()

@@ -4,17 +4,18 @@ import { Header } from './components/Header/Header';
 import { DocumentList } from './components/DocumentList/DocumentList';
 import { Calculator } from './components/Calculator/Calculator';
 import { Statistics } from './components/Statistics/Statistics';
+import { lazy, Suspense } from 'react';
+const CalculatorPage = lazy(() => import('./pages/CalculatorPage/CalculatorPage').then(m => ({ default: m.CalculatorPage })));
 import { ErrorBoundary } from './components/ErrorBoundary/ErrorBoundary';
-import { useCalculatorStore } from './store/calculatorStore';
-import { useDocumentStore } from './store/documentStore';
+// Calculator functionality is now handled via routing
 import { usePerformanceTracking, useErrorTracking } from './hooks/useAnalytics';
 import { dataVerification } from './utils/dataVerification';
+import { getShortVersion } from './config/version';
 import './styles/theme.css';
 import './App.css';
 
 function App() {
-  const { openCalculator, settings } = useCalculatorStore();
-  const { recalculateAllDocuments } = useDocumentStore();
+  // Calculator functionality is now handled via routing
   
   // Initialize analytics tracking
   usePerformanceTracking();
@@ -39,13 +40,35 @@ function App() {
     <ErrorBoundary>
       <Router>
         <div className="app">
-          <Header onCalculatorOpen={openCalculator} />
+          {/* Version display at top */}
+          <div style={{
+            position: 'fixed',
+            top: '8px',
+            right: '8px',
+            fontSize: '12px',
+            color: '#fff',
+            backgroundColor: 'rgba(7, 81, 86, 0.9)',
+            padding: '6px 12px',
+            borderRadius: '4px',
+            fontFamily: 'monospace',
+            zIndex: 10000,
+            boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+          }}>
+            {getShortVersion()}
+          </div>
+          
+          <Header />
           
           <main className="app-main">
             <ErrorBoundary>
               <Routes>
                 <Route path="/" element={<DocumentList />} />
                 <Route path="/statistics" element={<Statistics />} />
+                <Route path="/calculator" element={
+                  <Suspense fallback={<div style={{ padding: '20px', textAlign: 'center' }}>Loading calculator...</div>}>
+                    <CalculatorPage />
+                  </Suspense>
+                } />
               </Routes>
             </ErrorBoundary>
           </main>

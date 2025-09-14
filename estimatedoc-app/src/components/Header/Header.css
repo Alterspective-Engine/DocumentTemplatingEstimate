@@ -9,6 +9,64 @@
   position: relative;
 }
 
+/* Data Action Buttons */
+.reload-button,
+.reprocess-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--alterspective-citrus);
+  color: var(--alterspective-navy);
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.reprocess-button {
+  background: var(--alterspective-green);
+  color: var(--alterspective-white);
+}
+
+.reload-button:hover:not(:disabled) {
+  background: var(--alterspective-green);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(171, 221, 101, 0.3);
+}
+
+.reprocess-button:hover:not(:disabled) {
+  background: var(--alterspective-marine);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(7, 81, 86, 0.3);
+}
+
+.reload-button:disabled,
+.reprocess-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.reload-button.loading {
+  background: var(--alterspective-green);
+}
+
+.reprocess-button.loading {
+  background: var(--alterspective-marine);
+}
+
+.reload-button svg.spin,
+.reprocess-button svg.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 /* Geometric Pattern Overlay - Inspired by Brand Guidelines */
 .app-header::before {
   content: '';

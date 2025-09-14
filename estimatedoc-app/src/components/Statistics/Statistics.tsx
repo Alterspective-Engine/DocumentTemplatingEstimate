@@ -29,36 +29,69 @@ export const Statistics: React.FC = () => {
   const effortData = [
     { 
       name: 'Simple', 
-      calculated: documents.filter(d => d.complexity.level === 'Simple').reduce((sum, d) => sum + d.effort.calculated, 0),
-      optimized: documents.filter(d => d.complexity.level === 'Simple').reduce((sum, d) => sum + d.effort.optimized, 0)
+      calculated: documents.filter(d => {
+        const complexity = (d.complexity as any)?.level || d.complexity;
+        return complexity === 'Simple' || complexity === 'simple';
+      }).reduce((sum, d) => sum + (d.effort?.calculated || 0), 0),
+      optimized: documents.filter(d => {
+        const complexity = (d.complexity as any)?.level || d.complexity;
+        return complexity === 'Simple' || complexity === 'simple';
+      }).reduce((sum, d) => sum + (d.effort?.optimized || 0), 0)
     },
     { 
       name: 'Moderate', 
-      calculated: documents.filter(d => d.complexity.level === 'Moderate').reduce((sum, d) => sum + d.effort.calculated, 0),
-      optimized: documents.filter(d => d.complexity.level === 'Moderate').reduce((sum, d) => sum + d.effort.optimized, 0)
+      calculated: documents.filter(d => {
+        const complexity = (d.complexity as any)?.level || d.complexity;
+        return complexity === 'Moderate' || complexity === 'moderate';
+      }).reduce((sum, d) => sum + (d.effort?.calculated || 0), 0),
+      optimized: documents.filter(d => {
+        const complexity = (d.complexity as any)?.level || d.complexity;
+        return complexity === 'Moderate' || complexity === 'moderate';
+      }).reduce((sum, d) => sum + (d.effort?.optimized || 0), 0)
     },
     { 
       name: 'Complex', 
-      calculated: documents.filter(d => d.complexity.level === 'Complex').reduce((sum, d) => sum + d.effort.calculated, 0),
-      optimized: documents.filter(d => d.complexity.level === 'Complex').reduce((sum, d) => sum + d.effort.optimized, 0)
+      calculated: documents.filter(d => {
+        const complexity = (d.complexity as any)?.level || d.complexity;
+        return complexity === 'Complex' || complexity === 'complex';
+      }).reduce((sum, d) => sum + (d.effort?.calculated || 0), 0),
+      optimized: documents.filter(d => {
+        const complexity = (d.complexity as any)?.level || d.complexity;
+        return complexity === 'Complex' || complexity === 'complex';
+      }).reduce((sum, d) => sum + (d.effort?.optimized || 0), 0)
     }
   ];
 
   const totalStats = {
     documents: documents.length,
-    totalFields: documents.reduce((sum, d) => sum + d.totals.allFields, 0),
-    totalEffort: documents.reduce((sum, d) => sum + d.effort.calculated, 0),
-    totalOptimized: documents.reduce((sum, d) => sum + d.effort.optimized, 0),
-    totalSavings: documents.reduce((sum, d) => sum + d.effort.savings, 0),
-    avgReusability: documents.reduce((sum, d) => sum + parseFloat(d.totals.reuseRate), 0) / documents.length
+    totalFields: documents.reduce((sum, d) => sum + (d.totals?.allFields || 0), 0),
+    totalEffort: documents.reduce((sum, d) => sum + (d.effort?.calculated || 0), 0),
+    totalOptimized: documents.reduce((sum, d) => sum + (d.effort?.optimized || 0), 0),
+    totalSavings: documents.reduce((sum, d) => sum + (d.effort?.savings || 0), 0),
+    avgReusability: documents.reduce((sum, d) => sum + (d.reusability || 0), 0) / (documents.length || 1)
   };
 
   const fieldTypeData = [
-    { name: 'IF Statements', value: documents.reduce((sum, d) => sum + d.fields.if.count, 0) },
-    { name: 'Scripts', value: documents.reduce((sum, d) => sum + d.fields.precedentScript.count + d.fields.scripted.count + d.fields.builtInScript.count, 0) },
-    { name: 'Search', value: documents.reduce((sum, d) => sum + d.fields.search.count, 0) },
-    { name: 'Reflection', value: documents.reduce((sum, d) => sum + d.fields.reflection.count, 0) },
-    { name: 'Other', value: documents.reduce((sum, d) => sum + d.fields.unbound.count + d.fields.extended.count, 0) }
+    { name: 'IF Statements', value: documents.reduce((sum, d) => {
+      const fields = d.fields && typeof d.fields === 'object' ? d.fields : null;
+      return sum + (fields?.if?.count || 0);
+    }, 0) },
+    { name: 'Scripts', value: documents.reduce((sum, d) => {
+      const fields = d.fields && typeof d.fields === 'object' ? d.fields : null;
+      return sum + (fields?.precedentScript?.count || 0) + (fields?.scripted?.count || 0) + (fields?.builtInScript?.count || 0);
+    }, 0) },
+    { name: 'Search', value: documents.reduce((sum, d) => {
+      const fields = d.fields && typeof d.fields === 'object' ? d.fields : null;
+      return sum + (fields?.search?.count || 0);
+    }, 0) },
+    { name: 'Reflection', value: documents.reduce((sum, d) => {
+      const fields = d.fields && typeof d.fields === 'object' ? d.fields : null;
+      return sum + (fields?.reflection?.count || 0);
+    }, 0) },
+    { name: 'Other', value: documents.reduce((sum, d) => {
+      const fields = d.fields && typeof d.fields === 'object' ? d.fields : null;
+      return sum + (fields?.unbound?.count || 0) + (fields?.extended?.count || 0);
+    }, 0) }
   ];
 
   return (
@@ -229,19 +262,19 @@ export const Statistics: React.FC = () => {
           </thead>
           <tbody>
             {documents
-              .sort((a, b) => b.effort.calculated - a.effort.calculated)
+              .sort((a, b) => (b.effort?.calculated || 0) - (a.effort?.calculated || 0))
               .slice(0, 10)
               .map(doc => (
                 <tr key={doc.id}>
                   <td>{doc.name}</td>
-                  <td>{doc.totals.allFields}</td>
+                  <td>{doc.totals?.allFields || 0}</td>
                   <td>
                     <span className={`complexity-badge ${doc.complexity.level.toLowerCase()}`}>
                       {doc.complexity.level}
                     </span>
                   </td>
-                  <td>{doc.effort.calculated.toFixed(1)}</td>
-                  <td>{doc.totals.reuseRate}</td>
+                  <td>{(doc.effort?.calculated || 0).toFixed(1)}</td>
+                  <td>{doc.totals?.reuseRate || '0%'}</td>
                 </tr>
               ))}
           </tbody>

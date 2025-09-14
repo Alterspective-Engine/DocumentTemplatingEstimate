@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect } from 'react';
 import { useCalculatorStore } from '../../store/calculatorStore';
 import { useDebounce } from '../../hooks/useDebounce';
 import { useAnalytics } from '../../hooks/useAnalytics';

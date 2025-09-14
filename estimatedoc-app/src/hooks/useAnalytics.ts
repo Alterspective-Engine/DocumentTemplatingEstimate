@@ -1,7 +1,7 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import { AnalyticsService } from '../services/analytics/AnalyticsService';
-import { UserAction } from '../services/analytics/types';
+import type { UserAction } from '../services/analytics/types';
 
 // Initialize analytics service singleton
 const analytics = AnalyticsService.getInstance();
@@ -140,7 +140,7 @@ export function useTrackVisibility(
             hasBeenVisible.current = true;
             
             trackAction({
-              type: 'action',
+              type: 'click',
               target: `${componentName}_visible`,
               timestamp: Date.now(),
               context: {
@@ -174,7 +174,7 @@ export function useTimeTracking(componentName: string) {
       
       if (timeSpent > 1000) { // Only track if more than 1 second
         trackAction({
-          type: 'action',
+          type: 'click',
           target: `${componentName}_time_spent`,
           value: timeSpent,
           timestamp: Date.now()
@@ -187,11 +187,6 @@ export function useTimeTracking(componentName: string) {
 // Hook for tracking errors
 export function useErrorTracking() {
   useEffect(() => {
-    const handleError = (event: ErrorEvent) => {
-      // The analytics service already handles this globally
-      // This hook is for component-specific error handling
-    };
-
     const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
       initPromise.then(() => {
         const errorData = {

@@ -98,13 +98,13 @@ export const executeQuery = async (query: string): Promise<QueryResult> => {
       let result: any = {};
       
       if (normalizedQuery.includes('sum(effort_calculated)')) {
-        result.total_effort = documentsData.reduce((sum, doc) => sum + doc.effort.calculated, 0);
+        result.total_effort = documentsData.reduce((sum, doc) => sum + (doc.effort?.calculated || 0), 0);
       }
       if (normalizedQuery.includes('sum(effort_optimized)')) {
-        result.optimized_effort = documentsData.reduce((sum, doc) => sum + doc.effort.optimized, 0);
+        result.optimized_effort = documentsData.reduce((sum, doc) => sum + (doc.effort?.optimized || 0), 0);
       }
       if (normalizedQuery.includes('avg(total_fields)')) {
-        result.avg_fields = documentsData.reduce((sum, doc) => sum + doc.totals.allFields, 0) / documentsData.length;
+        result.avg_fields = documentsData.reduce((sum, doc) => sum + (doc.totals?.allFields || 0), 0) / documentsData.length;
       }
       
       return {

@@ -26,10 +26,12 @@ export const AnalyticsDashboard: React.FC = () => {
   const analytics = useMemo(() => {
     // Field type distribution
     const fieldTypeDistribution = filteredDocuments.reduce((acc, doc) => {
-      Object.entries(doc.fields).forEach(([type, field]) => {
-        if (!acc[type]) acc[type] = { count: 0, percentage: 0 };
-        acc[type].count += field.count;
-      });
+      if (doc.fields && typeof doc.fields === 'object' && !Array.isArray(doc.fields)) {
+        Object.entries(doc.fields).forEach(([type, field]) => {
+          if (!acc[type]) acc[type] = { count: 0, percentage: 0 };
+          acc[type].count += typeof field === 'number' ? field : (field as any)?.count || 0;
+        });
+      }
       return acc;
     }, {} as Record<string, { count: number; percentage: number }>);
 
@@ -54,23 +56,30 @@ export const AnalyticsDashboard: React.FC = () => {
       savingsPercentage: ((stats.totalEffort - stats.totalOptimizedEffort) / stats.totalEffort) * 100,
       averageEffortPerDoc: stats.totalEffort / stats.total,
       averageOptimizedPerDoc: stats.totalOptimizedEffort / stats.total,
-      highReuseDocs: filteredDocuments.filter(d => parseFloat(d.totals.reuseRate) > 60).length,
-      lowReuseDocs: filteredDocuments.filter(d => parseFloat(d.totals.reuseRate) < 30).length
+      highReuseDocs: filteredDocuments.filter(d => (d.reusability || 0) > 60).length,
+      lowReuseDocs: filteredDocuments.filter(d => (d.reusability || 0) < 30).length
     };
 
     // Top performers (most efficient documents)
     const topPerformers = [...filteredDocuments]
-      .sort((a, b) => b.effort.savings - a.effort.savings)
+      .filter(doc => doc.effort?.savings != null)
+      .sort((a, b) => (b.effort?.savings || 0) - (a.effort?.savings || 0))
       .slice(0, 5);
 
     // Field complexity analysis
     const fieldComplexity = filteredDocuments.reduce((acc, doc) => {
-      const scriptCount = doc.fields.precedentScript.count + 
-                         doc.fields.builtInScript.count + 
-                         doc.fields.scripted.count;
-      if (scriptCount === 0) acc.noScripts++;
-      else if (scriptCount < 5) acc.fewScripts++;
-      else acc.manyScripts++;
+      if (doc.fields && typeof doc.fields === 'object' && !Array.isArray(doc.fields)) {
+        const getFieldCount = (fieldName: string) => {
+          const field = (doc.fields as any)?.[fieldName];
+          return typeof field === 'number' ? field : (field as any)?.count || 0;
+        };
+        const scriptCount = getFieldCount('precedentScript') + 
+                           getFieldCount('builtInScript') + 
+                           getFieldCount('scripted');
+        if (scriptCount === 0) acc.noScripts++;
+        else if (scriptCount < 5) acc.fewScripts++;
+        else acc.manyScripts++;
+      }
       return acc;
     }, { noScripts: 0, fewScripts: 0, manyScripts: 0 });
 
@@ -104,13 +113,13 @@ export const AnalyticsDashboard: React.FC = () => {
       complexityBreakdown: stats.byComplexity,
       documents: filteredDocuments.map(doc => ({
         name: doc.name,
-        complexity: doc.complexity.level,
-        fields: doc.totals.allFields,
-        effort: doc.effort.calculated.toFixed(2),
-        optimized: doc.effort.optimized.toFixed(2),
-        savings: doc.effort.savings.toFixed(2),
-        reusability: doc.totals.reuseRate,
-        source: doc.evidence.source
+        complexity: (doc.complexity as any)?.level || doc.complexity || 'Unknown',
+        fields: doc.totals?.allFields || 0,
+        effort: doc.effort?.calculated?.toFixed(2) || '0.00',
+        optimized: doc.effort?.optimized?.toFixed(2) || '0.00',
+        savings: doc.effort?.savings?.toFixed(2) || '0.00',
+        reusability: `${doc.reusability || 0}%`,
+        source: (doc as any)?.evidence?.source || 'Unknown'
       })),
       fieldAnalysis: analytics.fieldTypeDistribution,
       efficiencyMetrics: {
@@ -151,13 +160,13 @@ export const AnalyticsDashboard: React.FC = () => {
     const csvHeaders = ['Document Name', 'Complexity', 'Total Fields', 'Effort (hrs)', 'Optimized (hrs)', 'Savings (hrs)', 'Reusability (%)', 'Source'];
     const csvRows = filteredDocuments.map(doc => [
       doc.name,
-      doc.complexity.level,
-      doc.totals.allFields,
-      doc.effort.calculated.toFixed(2),
-      doc.effort.optimized.toFixed(2),
-      doc.effort.savings.toFixed(2),
-      doc.totals.reuseRate,
-      doc.evidence.source
+      (doc.complexity as any)?.level || doc.complexity || 'Unknown',
+      doc.totals?.allFields || 0,
+      doc.effort?.calculated?.toFixed(2) || '0.00',
+      doc.effort?.optimized?.toFixed(2) || '0.00',
+      doc.effort?.savings?.toFixed(2) || '0.00',
+      `${doc.reusability || 0}%`,
+      (doc as any)?.evidence?.source || 'Unknown'
     ]);
     
     const csvContent = [
@@ -355,11 +364,11 @@ export const AnalyticsDashboard: React.FC = () => {
                   <div className="performer-info">
                     <span className="performer-name">{doc.name}</span>
                     <span className="performer-savings">
-                      Saves {formatHours(doc.effort.savings)}
+                      Saves {formatHours(doc.effort?.savings || 0)}
                     </span>
                   </div>
                   <div className="performer-badge">
-                    {formatPercentage((doc.effort.savings / doc.effort.calculated) * 100)}
+                    {formatPercentage(((doc.effort?.savings || 0) / (doc.effort?.calculated || 1)) * 100)}
                   </div>
                 </div>
               ))}

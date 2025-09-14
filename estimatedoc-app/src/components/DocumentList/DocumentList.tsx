@@ -20,7 +20,7 @@ export const DocumentList: React.FC = () => {
 
   const [searchTerm, setSearchTerm] = useState(filter.searchTerm || '');
   const [showFilters, setShowFilters] = useState(false);
-  const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [searchTimeout, setSearchTimeout] = useState<ReturnType<typeof setTimeout> | null>(null);
   
   const { trackSearch, trackFilter, trackSort, trackDocumentView } = useAnalytics();
 
@@ -80,6 +80,10 @@ export const DocumentList: React.FC = () => {
     trackDocumentView(document.id, document.name);
   };
 
+  const createDocumentClickHandler = (document: any) => () => {
+    handleDocumentClick(document);
+  };
+
   const clearFilters = () => {
     // Clear any pending search timeout
     if (searchTimeout) {
@@ -97,7 +101,7 @@ export const DocumentList: React.FC = () => {
   return (
     <div className="document-list-container">
       {/* Header with Search and Filters */}
-      <div className="list-header glass-panel">
+      <div className="list-header">
         <div className="search-bar">
           <Search size={20} className="search-icon" />
           <input
@@ -141,7 +145,7 @@ export const DocumentList: React.FC = () => {
 
       {/* Filter Panel */}
       {showFilters && (
-        <div className="filter-panel glass-panel">
+        <div className="filter-panel">
           <div className="filter-section">
             <h3 className="label-large">Complexity</h3>
             <div className="filter-chips">
@@ -249,7 +253,7 @@ export const DocumentList: React.FC = () => {
           <DocumentCard
             key={document.id}
             document={document}
-            onClick={handleDocumentClick}
+            onClick={createDocumentClickHandler(document)}
             selected={selectedDocument?.id === document.id}
           />
         ))}

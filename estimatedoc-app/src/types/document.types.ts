@@ -73,18 +73,86 @@ export interface DocumentEvidence {
 }
 
 export interface Document {
-  id: number;
+  id: string | number;
   name: string;
   description: string;
-  sqlFilename: string;
+  template?: string;
+  fields?: number | DocumentFields;
   
-  fields: DocumentFields;
-  totals: DocumentTotals;
-  complexity: DocumentComplexity;
-  effort: DocumentEffort;
-  evidence: DocumentEvidence;
+  // Field types breakdown
+  fieldTypes?: {
+    ifStatement: number;
+    precedentScript: number;
+    reflection: number;
+    search: number;
+    unbound: number;
+    builtInScript: number;
+    extended: number;
+    scripted: number;
+  };
   
-  // Metadata
+  // Complexity assessment
+  complexity: {
+    level: 'Simple' | 'Moderate' | 'Complex';
+    factors?: {
+      fields: number;
+      scripts: number;
+      conditionals: number;
+    };
+    reason?: string;
+    calculation?: CalculationTrace;
+  };
+  
+  // Effort calculation
+  effort: {
+    base?: number;
+    calculated?: number;
+    optimized?: number;
+    savings?: number;
+    calculation?: CalculationTrace;
+  };
+  
+  // Evidence tracking
+  evidence: {
+    source: 'SQL' | 'Estimated' | string;
+    confidence?: number;
+    lastUpdated?: string | Date;
+    details?: string;
+    query?: string;
+    files?: string[];
+    traceability?: {
+      dataSource: string;
+      analysisDate: string;
+      documentId: number;
+      mappingMethod: string;
+    };
+  };
+  
+  // Reusability and risk
+  reusability?: number;
+  risk?: 'low' | 'medium' | 'high';
+  status?: 'pending' | 'processing' | 'completed';
+  
+  // Additional properties used by DocumentCard
+  estimatedHours?: number;
+  reuseRate?: number;
+  automationPotential?: number;
+  implementationRisk?: 'low' | 'medium' | 'high';
+  tags?: string[];
+  category?: string;
+  
+  // Extended metadata
+  metadata?: {
+    sqlDocId?: number;
+    sqlFilename?: string;
+    manifestCode?: string;
+    clientComplexity?: string;
+    createdAt?: string;
+  };
+  
+  // Legacy fields for compatibility
+  sqlFilename?: string;
+  totals?: DocumentTotals;
   sections?: number;
   tables?: number;
   checkboxes?: number;

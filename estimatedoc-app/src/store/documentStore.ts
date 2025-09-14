@@ -2,8 +2,12 @@ import { create } from 'zustand';
 import type { Document } from '../types/document.types';
 import type { CalculatorSettings } from '../types/calculator.types';
 import { documentsData } from '../data/documents';
+import databaseDocuments from '../data/database-documents';
+import sqlDocuments from '../data/sql-documents';
 import { useCalculatorStore } from './calculatorStore';
 import { useHistoryStore } from './historyStore';
+import dataSourceConfig from '../config/data-source';
+import { SQLiteService } from '../services/database/SQLiteService';
 
 interface DocumentFilter {
   complexity?: 'Simple' | 'Moderate' | 'Complex' | null;
@@ -28,6 +32,7 @@ interface DocumentStore {
   isRecalculating: boolean;
   recalculationProgress: number;
   updatingDocuments: Set<string>;
+  dataSource: 'SQLite' | 'SQL' | 'database' | 'hardcoded';
   
   // Actions
   setSelectedDocument: (document: Document | null) => void;
@@ -36,6 +41,7 @@ interface DocumentStore {
   applyFiltersAndSort: () => void;
   recalculateAllDocuments: (settings: CalculatorSettings) => void;
   recalculateAllDocumentsLive: (settings: CalculatorSettings) => Promise<void>;
+  reloadDataFromSQL: () => Promise<void>;
   
   // Statistics
   getStatistics: () => {
@@ -48,19 +54,64 @@ interface DocumentStore {
 }
 
 // Initialize documents with calculated values
-const initializeDocuments = () => {
+const initializeDocuments = (): { documents: Document[], source: 'SQLite' | 'SQL' | 'database' | 'hardcoded' } => {
   const calculatorStore = useCalculatorStore.getState();
   const settings = calculatorStore.settings;
   
-  // Calculate all documents with current settings
-  return documentsData.map(doc => {
-    return calculatorStore.recalculateDocument(doc, settings);
-  });
+  try {
+    // Priority: 1. SQLite database, 2. SQL JSON exports, 3. Database documents, 4. Hardcoded data
+    let documentsToUse: Document[] = [];
+    let source: 'SQLite' | 'SQL' | 'database' | 'hardcoded' = 'SQL';
+    
+    // Try SQLite first
+    try {
+      const sqliteService = SQLiteService.getInstance();
+      const sqliteDocs = sqliteService.getAllDocuments();
+      
+      if (sqliteDocs && sqliteDocs.length > 0) {
+        console.log(`📊 Loading ${sqliteDocs.length} documents from SQLite database`);
+        documentsToUse = sqliteDocs;
+        source = 'SQLite';
+      }
+    } catch (sqliteError) {
+      console.log('⚠️ SQLite not available:', sqliteError);
+    }
+    
+    // Fall back to SQL JSON exports if SQLite is empty
+    if (documentsToUse.length === 0) {
+      if (sqlDocuments && sqlDocuments.length > 0) {
+        console.log(`📊 Loading ${sqlDocuments.length} documents from SQL JSON exports`);
+        documentsToUse = sqlDocuments;
+        source = 'SQL';
+      } else {
+        console.log('⚠️ SQL documents not available, falling back to database documents');
+        const useDatabase = dataSourceConfig.type === 'database' || dataSourceConfig.useDatabaseIfAvailable;
+        documentsToUse = useDatabase ? databaseDocuments : documentsData;
+        source = useDatabase ? 'database' : 'hardcoded';
+      }
+    }
+    
+    console.log(`✅ Loaded ${documentsToUse.length} documents from ${source} source`);
+    
+    // Calculate all documents with current settings
+    const documents = documentsToUse.map(doc => {
+      return calculatorStore.recalculateDocument(doc, settings);
+    });
+    
+    return { documents, source };
+  } catch (error) {
+    console.error('❌ Error initializing documents:', error);
+    // Final fallback to hardcoded data
+    const documents = documentsData.map(doc => {
+      return calculatorStore.recalculateDocument(doc, settings);
+    });
+    return { documents, source: 'hardcoded' };
+  }
 };
 
 export const useDocumentStore = create<DocumentStore>((set, get) => {
   // Initialize with calculated documents
-  const initialDocs = initializeDocuments();
+  const { documents: initialDocs, source } = initializeDocuments();
   
   return {
     documents: initialDocs,
@@ -71,6 +122,7 @@ export const useDocumentStore = create<DocumentStore>((set, get) => {
     isRecalculating: false,
     recalculationProgress: 0,
     updatingDocuments: new Set(),
+    dataSource: source,
   
   setSelectedDocument: (document) => set({ selectedDocument: document }),
   
@@ -91,7 +143,10 @@ export const useDocumentStore = create<DocumentStore>((set, get) => {
     let filtered = [...documents];
     
     if (filter.complexity) {
-      filtered = filtered.filter(doc => doc.complexity.level === filter.complexity);
+      filtered = filtered.filter(doc => {
+        const complexity = (doc.complexity as any)?.level || doc.complexity || 'simple';
+        return complexity === filter.complexity;
+      });
     }
     
     if (filter.source) {
@@ -107,18 +162,35 @@ export const useDocumentStore = create<DocumentStore>((set, get) => {
     }
     
     if (filter.minFields !== undefined) {
-      filtered = filtered.filter(doc => doc.totals.allFields >= filter.minFields!);
+      filtered = filtered.filter(doc => {
+        const fieldCount = doc.totals?.allFields || 
+                          (typeof doc.fields === 'number' ? doc.fields : 0) ||
+                          (doc.fieldTypes ? Object.values(doc.fieldTypes).reduce((sum: number, val) => sum + (val as number), 0) : 0);
+        return fieldCount >= filter.minFields!;
+      });
     }
     
     if (filter.maxFields !== undefined) {
-      filtered = filtered.filter(doc => doc.totals.allFields <= filter.maxFields!);
+      filtered = filtered.filter(doc => {
+        const fieldCount = doc.totals?.allFields || 
+                          (typeof doc.fields === 'number' ? doc.fields : 0) ||
+                          (doc.fieldTypes ? Object.values(doc.fieldTypes).reduce((sum: number, val) => sum + (val as number), 0) : 0);
+        return fieldCount <= filter.maxFields!;
+      });
     }
     
     if (filter.hasScripts !== undefined) {
       filtered = filtered.filter(doc => {
-        const scriptCount = doc.fields.precedentScript.count + 
-                          doc.fields.builtInScript.count + 
-                          doc.fields.scripted.count;
+        let scriptCount = 0;
+        if (doc.fields && typeof doc.fields === 'object' && 'precedentScript' in doc.fields) {
+          scriptCount = (doc.fields as any).precedentScript.count + 
+                       (doc.fields as any).builtInScript.count + 
+                       (doc.fields as any).scripted.count;
+        } else if (doc.fieldTypes) {
+          scriptCount = (doc.fieldTypes.precedentScript || 0) + 
+                       (doc.fieldTypes.builtInScript || 0) + 
+                       (doc.fieldTypes.scripted || 0);
+        }
         return filter.hasScripts ? scriptCount > 0 : scriptCount === 0;
       });
     }
@@ -133,17 +205,25 @@ export const useDocumentStore = create<DocumentStore>((set, get) => {
           break;
         case 'complexity':
           const complexityOrder = { 'Simple': 1, 'Moderate': 2, 'Complex': 3 };
-          compareValue = complexityOrder[a.complexity.level] - complexityOrder[b.complexity.level];
+          const aComplexity = (a.complexity as any)?.level || a.complexity || 'Simple';
+          const bComplexity = (b.complexity as any)?.level || b.complexity || 'Simple';
+          compareValue = (complexityOrder[aComplexity as keyof typeof complexityOrder] || 1) - (complexityOrder[bComplexity as keyof typeof complexityOrder] || 1);
           break;
         case 'effort':
-          compareValue = a.effort.calculated - b.effort.calculated;
+          compareValue = (a.effort?.calculated || a.effort?.base || 0) - (b.effort?.calculated || b.effort?.base || 0);
           break;
         case 'fields':
-          compareValue = a.totals.allFields - b.totals.allFields;
+          const aFields = a.totals?.allFields || 
+                         (typeof a.fields === 'number' ? a.fields : 0) ||
+                         (a.fieldTypes ? Object.values(a.fieldTypes).reduce((sum: number, val) => sum + (val as number), 0) : 0);
+          const bFields = b.totals?.allFields || 
+                         (typeof b.fields === 'number' ? b.fields : 0) ||
+                         (b.fieldTypes ? Object.values(b.fieldTypes).reduce((sum: number, val) => sum + (val as number), 0) : 0);
+          compareValue = aFields - bFields;
           break;
         case 'reusability':
-          const aReuse = parseFloat(a.totals.reuseRate);
-          const bReuse = parseFloat(b.totals.reuseRate);
+          const aReuse = a.totals?.reuseRate ? parseFloat(a.totals.reuseRate) : (a.reusability || 0);
+          const bReuse = b.totals?.reuseRate ? parseFloat(b.totals.reuseRate) : (b.reusability || 0);
           compareValue = aReuse - bReuse;
           break;
       }
@@ -162,11 +242,11 @@ export const useDocumentStore = create<DocumentStore>((set, get) => {
     // Record history for each document
     documents.forEach(doc => {
       historyStore.recordDocumentChange(doc.id.toString(), doc.name, {
-        effort: doc.effort.calculated,
-        optimized: doc.effort.optimized,
-        savings: doc.effort.savings,
-        complexity: doc.complexity.level,
-        fields: doc.totals.allFields
+        effort: doc.effort?.calculated || 0,
+        optimized: doc.effort?.optimized || 0,
+        savings: doc.effort?.savings || 0,
+        complexity: (doc.complexity as any)?.level || doc.complexity || 'simple',
+        fields: doc.totals?.allFields || 0
       });
     });
     
@@ -200,16 +280,15 @@ export const useDocumentStore = create<DocumentStore>((set, get) => {
     // Record current state to history
     documents.forEach(doc => {
       historyStore.recordDocumentChange(doc.id.toString(), doc.name, {
-        effort: doc.effort.calculated,
-        optimized: doc.effort.optimized,
-        savings: doc.effort.savings,
-        complexity: doc.complexity.level,
-        fields: doc.totals.allFields
+        effort: doc.effort?.calculated || 0,
+        optimized: doc.effort?.optimized || 0,
+        savings: doc.effort?.savings || 0,
+        complexity: (doc.complexity as any)?.level || doc.complexity || 'simple',
+        fields: doc.totals?.allFields || 0
       });
     });
     
     const recalculatedDocs = [...documents];
-    const totalBatches = Math.ceil(documents.length / batchSize);
     
     for (let i = 0; i < documents.length; i += batchSize) {
       const batch = documents.slice(i, i + batchSize);
@@ -264,19 +343,51 @@ export const useDocumentStore = create<DocumentStore>((set, get) => {
     }, 500);
   },
   
+  reloadDataFromSQL: async () => {
+    console.log('🔄 Reloading data from SQL...');
+    set({ isRecalculating: true, recalculationProgress: 0 });
+    
+    try {
+      // Re-run the process-sql-data script (this would be done server-side in production)
+      // For now, we'll just reload the documents
+      const { documents: newDocs, source } = initializeDocuments();
+      
+      set({ 
+        documents: newDocs,
+        filteredDocuments: newDocs,
+        dataSource: source,
+        isRecalculating: false,
+        recalculationProgress: 100
+      });
+      
+      get().applyFiltersAndSort();
+      
+      console.log(`✅ Reloaded ${newDocs.length} documents from ${source} source`);
+      
+      // Clear progress after animation
+      setTimeout(() => {
+        set({ recalculationProgress: 0 });
+      }, 500);
+    } catch (error) {
+      console.error('❌ Error reloading data:', error);
+      set({ isRecalculating: false, recalculationProgress: 0 });
+    }
+  },
+  
   getStatistics: () => {
     const { filteredDocuments } = get();
     
     const byComplexity = filteredDocuments.reduce((acc, doc) => {
-      acc[doc.complexity.level] = (acc[doc.complexity.level] || 0) + 1;
+      const complexity = (doc.complexity as any)?.level || doc.complexity || 'simple';
+      acc[complexity] = (acc[complexity] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
     
-    const totalEffort = filteredDocuments.reduce((sum, doc) => sum + doc.effort.calculated, 0);
-    const totalOptimizedEffort = filteredDocuments.reduce((sum, doc) => sum + doc.effort.optimized, 0);
+    const totalEffort = filteredDocuments.reduce((sum, doc) => sum + (doc.effort?.calculated || 0), 0);
+    const totalOptimizedEffort = filteredDocuments.reduce((sum, doc) => sum + (doc.effort?.optimized || 0), 0);
     
     const totalReusability = filteredDocuments.reduce((sum, doc) => {
-      return sum + parseFloat(doc.totals.reuseRate);
+      return sum + parseFloat(String(doc.totals?.reuseRate || '0'));
     }, 0);
     
     return {

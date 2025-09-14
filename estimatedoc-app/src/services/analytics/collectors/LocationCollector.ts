@@ -1,4 +1,4 @@
-import { LocationInfo } from '../types';
+import type { LocationInfo } from '../types';
 
 export class LocationCollector {
   private static readonly IP_API_URL = 'https://ipapi.co/json/';
@@ -100,7 +100,6 @@ export class LocationCollector {
   public static async estimateLocation(): Promise<Partial<LocationInfo>> {
     // Use timezone to estimate rough location
     const timezone = await this.getTimezone();
-    const language = navigator.language;
     
     const locationMap: Record<string, Partial<LocationInfo>> = {
       'America/New_York': { country: 'United States', region: 'East Coast' },

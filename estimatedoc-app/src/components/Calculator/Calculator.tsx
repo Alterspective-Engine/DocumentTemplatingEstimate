@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useCalculatorStore, CALCULATOR_PRESETS } from '../../store/calculatorStore';
 import { useDocumentStore } from '../../store/documentStore';
 import { useDebounce } from '../../hooks/useDebounce';
@@ -225,7 +225,7 @@ export const Calculator: React.FC = () => {
 
   return (
     <div className="calculator-overlay">
-      <div className="calculator-panel glass-modal enhanced">
+      <div className="calculator-panel">
         <div className="calculator-header">
           <div className="header-title">
             <CalcIcon size={24} />
@@ -272,9 +272,17 @@ export const Calculator: React.FC = () => {
         {/* Validation Errors */}
         <ValidationErrors errors={validationErrors} />
 
-        {/* Preset Selector */}
+        {/* Preset Selector and Reset Button */}
         <div className="calculator-toolbar">
           <PresetSelector onSelect={applyPreset} />
+          <button 
+            className="reset-button"
+            onClick={resetToDefaults}
+            title="Reset all settings to default values"
+          >
+            <RotateCcw size={18} />
+            Reset to Defaults
+          </button>
         </div>
 
         {/* Live Preview Panel */}
@@ -366,9 +374,7 @@ export const Calculator: React.FC = () => {
                     <div className="slider-value">{estimate.current}</div>
                   </div>
                 </div>
-              ))
-
-}
+              ))}
             </div>
           </section>
 

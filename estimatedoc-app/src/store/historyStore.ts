@@ -86,8 +86,13 @@ export const useHistoryStore = create<HistoryStore>()(
         const { documentHistories, maxHistoryPoints } = get();
         const timestamp = Date.now();
         
+        // Ensure documentHistories is a Map (fix for persistence issue)
+        const historiesMap = documentHistories instanceof Map 
+          ? documentHistories 
+          : new Map<string, DocumentHistory>(Object.entries(documentHistories || {}) as [string, DocumentHistory][]);
+        
         // Get or create document history
-        let docHistory = documentHistories.get(documentId);
+        let docHistory = historiesMap.get(documentId);
         if (!docHistory) {
           docHistory = {
             documentId,
@@ -117,7 +122,7 @@ export const useHistoryStore = create<HistoryStore>()(
         }
         
         // Update the map
-        const newHistories = new Map(documentHistories);
+        const newHistories = new Map(historiesMap);
         newHistories.set(documentId, docHistory);
         
         set({ documentHistories: newHistories });
@@ -148,11 +153,19 @@ export const useHistoryStore = create<HistoryStore>()(
       },
       
       getDocumentHistory: (documentId) => {
-        return get().documentHistories.get(documentId);
+        const { documentHistories } = get();
+        const historiesMap = documentHistories instanceof Map 
+          ? documentHistories 
+          : new Map<string, DocumentHistory>(Object.entries(documentHistories || {}) as [string, DocumentHistory][]);
+        return historiesMap.get(documentId);
       },
       
       getRecentChange: (documentId, field) => {
-        const docHistory = get().documentHistories.get(documentId);
+        const { documentHistories } = get();
+        const historiesMap = documentHistories instanceof Map 
+          ? documentHistories 
+          : new Map<string, DocumentHistory>(Object.entries(documentHistories || {}) as [string, DocumentHistory][]);
+        const docHistory = historiesMap.get(documentId);
         if (!docHistory) return null;
         
         const fieldHistory = docHistory[field] as ValueHistory[];
@@ -187,7 +200,10 @@ export const useHistoryStore = create<HistoryStore>()(
       
       clearDocumentHistory: (documentId) => {
         const { documentHistories } = get();
-        const newHistories = new Map(documentHistories);
+        const historiesMap = documentHistories instanceof Map 
+          ? documentHistories 
+          : new Map<string, DocumentHistory>(Object.entries(documentHistories || {}) as [string, DocumentHistory][]);
+        const newHistories = new Map(historiesMap);
         newHistories.delete(documentId);
         set({ documentHistories: newHistories });
       }
