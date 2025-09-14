@@ -1,8 +1,8 @@
 // Version configuration - automatically updated during build
 export const APP_VERSION = {
-  version: '0.2.0',
-  buildTime: '2025-09-13T02:36:53.316Z',
-  buildNumber: 'mfhnnu10', // Short unique identifier
+  version: '0.4.0',
+  buildTime: '2025-09-14T02:07:09.875Z',
+  buildNumber: 'mfj21gkz', // Short unique identifier
 };
 
 // Function to format version string

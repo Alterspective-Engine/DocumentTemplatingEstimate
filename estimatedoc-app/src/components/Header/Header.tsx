@@ -21,37 +21,23 @@ export const Header: React.FC<HeaderProps> = () => {
   };
 
   const handleReprocessData = async () => {
-    if (!confirm('This will reimport all data from newSQL and ImportantData folders.\nCalculator settings will be preserved.\nContinue?')) {
+    // In browser environment, we can only reload the JSON data
+    if (!confirm('This will reload data from the processed SQL JSON files.\nCalculator settings will be preserved.\nContinue?')) {
       return;
     }
     
     setIsReprocessing(true);
     try {
-      // Call the reprocess API
-      const response = await fetch('/api/reprocess/import', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          preserveSettings: true
-        })
-      });
-      
-      const result = await response.json();
-      
-      if (result.success) {
-        alert(`Data reprocessed successfully!\n\nImported:\n- ${result.stats.documents} documents\n- ${result.stats.fields} fields\n- ${result.stats.analyses} field analyses`);
-        // Reload the page to get fresh data
+      // Since we're in the browser, just reload the page to get fresh data
+      // The SQL JSON files are already processed and included in the build
+      setTimeout(() => {
         window.location.reload();
-      } else {
-        alert(`Reprocess failed: ${result.error}`);
-      }
+      }, 500);
     } catch (error) {
       console.error('Reprocess error:', error);
-      alert('Failed to reprocess data. Check console for details.');
+      alert('Failed to reload data. Please refresh the page manually.');
     } finally {
-      setIsReprocessing(false);
+      setTimeout(() => setIsReprocessing(false), 500);
     }
   };
 

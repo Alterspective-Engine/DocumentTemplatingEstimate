@@ -7,7 +7,6 @@ import sqlDocuments from '../data/sql-documents';
 import { useCalculatorStore } from './calculatorStore';
 import { useHistoryStore } from './historyStore';
 import dataSourceConfig from '../config/data-source';
-import { SQLiteService } from '../services/database/SQLiteService';
 
 interface DocumentFilter {
   complexity?: 'Simple' | 'Moderate' | 'Complex' | null;
@@ -32,7 +31,7 @@ interface DocumentStore {
   isRecalculating: boolean;
   recalculationProgress: number;
   updatingDocuments: Set<string>;
-  dataSource: 'SQLite' | 'SQL' | 'database' | 'hardcoded';
+  dataSource: 'SQL' | 'database' | 'hardcoded';
   
   // Actions
   setSelectedDocument: (document: Document | null) => void;
@@ -54,41 +53,26 @@ interface DocumentStore {
 }
 
 // Initialize documents with calculated values
-const initializeDocuments = (): { documents: Document[], source: 'SQLite' | 'SQL' | 'database' | 'hardcoded' } => {
+const initializeDocuments = (): { documents: Document[], source: 'SQL' | 'database' | 'hardcoded' } => {
   const calculatorStore = useCalculatorStore.getState();
   const settings = calculatorStore.settings;
   
   try {
-    // Priority: 1. SQLite database, 2. SQL JSON exports, 3. Database documents, 4. Hardcoded data
+    // Priority: 1. SQL JSON exports, 2. Database documents, 3. Hardcoded data
+    // Note: SQLite cannot run in browser, only use JSON data
     let documentsToUse: Document[] = [];
-    let source: 'SQLite' | 'SQL' | 'database' | 'hardcoded' = 'SQL';
+    let source: 'SQL' | 'database' | 'hardcoded' = 'SQL';
     
-    // Try SQLite first
-    try {
-      const sqliteService = SQLiteService.getInstance();
-      const sqliteDocs = sqliteService.getAllDocuments();
-      
-      if (sqliteDocs && sqliteDocs.length > 0) {
-        console.log(`📊 Loading ${sqliteDocs.length} documents from SQLite database`);
-        documentsToUse = sqliteDocs;
-        source = 'SQLite';
-      }
-    } catch (sqliteError) {
-      console.log('⚠️ SQLite not available:', sqliteError);
-    }
-    
-    // Fall back to SQL JSON exports if SQLite is empty
-    if (documentsToUse.length === 0) {
-      if (sqlDocuments && sqlDocuments.length > 0) {
-        console.log(`📊 Loading ${sqlDocuments.length} documents from SQL JSON exports`);
-        documentsToUse = sqlDocuments;
-        source = 'SQL';
-      } else {
-        console.log('⚠️ SQL documents not available, falling back to database documents');
-        const useDatabase = dataSourceConfig.type === 'database' || dataSourceConfig.useDatabaseIfAvailable;
-        documentsToUse = useDatabase ? databaseDocuments : documentsData;
-        source = useDatabase ? 'database' : 'hardcoded';
-      }
+    // Use SQL JSON exports as primary source
+    if (sqlDocuments && sqlDocuments.length > 0) {
+      console.log(`📊 Loading ${sqlDocuments.length} documents from SQL JSON exports`);
+      documentsToUse = sqlDocuments;
+      source = 'SQL';
+    } else {
+      console.log('⚠️ SQL documents not available, falling back to database documents');
+      const useDatabase = dataSourceConfig.type === 'database' || dataSourceConfig.useDatabaseIfAvailable;
+      documentsToUse = useDatabase ? databaseDocuments : documentsData;
+      source = useDatabase ? 'database' : 'hardcoded';
     }
     
     console.log(`✅ Loaded ${documentsToUse.length} documents from ${source} source`);
